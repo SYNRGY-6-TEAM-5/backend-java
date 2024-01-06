@@ -28,11 +28,11 @@ public class RoleInitizalizer implements CommandLineRunner {
             if (roleRepository.count() == 0) {
                 log.info("intialize data role");
                 // Jika tidak ada, tambahkan role yang dibutuhkan
-                Role clientRole = new Role();
-                clientRole.setRoleName(EnumRole.USER);
-                Role merchantRole = new Role();
-                merchantRole.setRoleName(EnumRole.ADMIN);
-                roleRepository.saveAll(Arrays.asList(clientRole, merchantRole));
+                Role userRole = new Role();
+                userRole.setRoleName(EnumRole.USER);
+                Role adminRole = new Role();
+                adminRole.setRoleName(EnumRole.ADMIN);
+                roleRepository.saveAll(Arrays.asList(userRole, adminRole));
                 log.info("success add data");
             }
 

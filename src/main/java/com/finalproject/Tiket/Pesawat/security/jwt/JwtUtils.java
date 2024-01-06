@@ -18,10 +18,10 @@ import java.util.Date;
 @Log4j2
 public class JwtUtils {
 
-    @Value("${binarfud.app.jwtSecret}")
+    @Value("${binar.app.jwtSecret}")
     private String jwtSecret;
 
-    @Value("${binarfud.app.jwtExpirationMs}")
+    @Value("${binar.app.jwtExpirationMs}")
     private int jwtExpirationMs;
 
 

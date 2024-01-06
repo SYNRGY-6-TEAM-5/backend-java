@@ -1,17 +1,18 @@
 spring:
   datasource:
 #    Sesuaikan dengan DB Masing masing
-    url: jdbc:postgresql://localhost:5432/e-flight
-#    username:
-#    password:
+    url: jdbc:postgresql://localhost:5432/e_flight
+    username: postgres
+    password: Bangsat@123
     driverClassName: org.postgresql.Driver
-    hibernate:
-      ddl-auto: update
 
   jpa:
+    hibernate:
+      ddl-auto: create
     properties:
       hibernate:
         dialect: org.hibernate.dialect.PostgreSQLDialect
+
 
   mail:
     host: smtp.gmail.com
@@ -28,11 +29,11 @@ spring:
           timeout: 5000
           writetimeout: 5000
 
-  security:
-    oauth2:
-      client:
-        registration:
-          github:
+#  security:
+#    oauth2:
+#      client:
+#        registration:
+#          github:
 #            client-id:
 #            client-secret:
 
