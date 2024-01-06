@@ -2,8 +2,8 @@ spring:
   datasource:
 #    Sesuaikan dengan DB Masing masing
     url: jdbc:postgresql://localhost:5432/e-flight
-    username: postgres
-    password: Bangsat@123
+#    username:
+#    password:
     driverClassName: org.postgresql.Driver
     hibernate:
       ddl-auto: update
