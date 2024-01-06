@@ -1,7 +1,6 @@
 package com.finalproject.Tiket.Pesawat.security.jwt;
 
 import com.finalproject.Tiket.Pesawat.security.service.UserDetailsImpl;
-import io.jsonwebtoken.JwtBuilder;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.io.Decoders;
