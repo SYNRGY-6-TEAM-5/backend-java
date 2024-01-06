@@ -1,0 +1,44 @@
+spring:
+  datasource:
+#    Sesuaikan dengan DB Masing masing
+    url: jdbc:postgresql://localhost:5432/e-flight
+    username: postgres
+    password: Bangsat@123
+    driverClassName: org.postgresql.Driver
+    hibernate:
+      ddl-auto: update
+
+  jpa:
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+
+  mail:
+    host: smtp.gmail.com
+    port: 587
+#    username:
+#    password:
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
+          connectiontimeout: 5000
+          timeout: 5000
+          writetimeout: 5000
+
+  security:
+    oauth2:
+      client:
+        registration:
+          github:
+#            client-id:
+#            client-secret:
+
+binar:
+  app:
+    jwtSecret: 357638792F423F4428472B4B6250655368566D597133743677397A2443264629
+#    NEED DISCUSSION WITH FE TEAM
+    jwtExpirationMs: 3600000
+
