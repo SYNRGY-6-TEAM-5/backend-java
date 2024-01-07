@@ -44,7 +44,7 @@ public class WebSecurityConfig {
                 .exceptionHandling(exception -> exception.authenticationEntryPoint(unauthorizedHandler))
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth ->
-                        auth.requestMatchers("/api/user/login").permitAll()
+                        auth.requestMatchers("/api/v1/auth/login").permitAll()
                                 .anyRequest()
                                 .authenticated())
         // oauth2 implement here
@@ -79,6 +79,5 @@ public class WebSecurityConfig {
             throws Exception {
         return authenticationConfiguration.getAuthenticationManager();
     }
-
 
 }

@@ -3,12 +3,12 @@ spring:
 #    Sesuaikan dengan DB Masing masing
     url: jdbc:postgresql://localhost:5432/e_flight
     username: postgres
-    password: Bangsat@123
+    password: NOVIANTO
     driverClassName: org.postgresql.Driver
 
   jpa:
     hibernate:
-      ddl-auto: create
+      ddl-auto: update
     properties:
       hibernate:
         dialect: org.hibernate.dialect.PostgreSQLDialect
@@ -42,4 +42,5 @@ binar:
     jwtSecret: 357638792F423F4428472B4B6250655368566D597133743677397A2443264629
 #    NEED DISCUSSION WITH FE TEAM
     jwtExpirationMs: 3600000
+    baseUrl: http://localhost:8080/api/
 
