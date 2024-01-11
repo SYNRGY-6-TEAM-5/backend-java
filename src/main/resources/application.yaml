@@ -3,7 +3,7 @@ spring:
 #    Sesuaikan dengan DB Masing masing
     url: jdbc:postgresql://localhost:5432/e_flight
     username: postgres
-    password: NOVIANTO
+    password:
     driverClassName: org.postgresql.Driver
 
   jpa:
@@ -17,8 +17,8 @@ spring:
   mail:
     host: smtp.gmail.com
     port: 587
-#    username:
-#    password:
+    username:
+    password:
     properties:
       mail:
         smtp:

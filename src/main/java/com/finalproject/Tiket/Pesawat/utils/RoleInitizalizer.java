@@ -1,4 +1,4 @@
-package com.finalproject.Tiket.Pesawat.service;
+package com.finalproject.Tiket.Pesawat.utils;
 
 
 import com.finalproject.Tiket.Pesawat.model.EnumRole;
