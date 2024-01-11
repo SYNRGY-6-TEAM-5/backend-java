@@ -5,6 +5,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.Date;
 import java.util.UUID;
 
 @Data
@@ -30,6 +31,9 @@ public class User {
 
     @Column(name = "is_active")
     private Boolean isActive;
+
+    @Column(name = "created_at")
+    private Date createdAt;
 
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "role_id")

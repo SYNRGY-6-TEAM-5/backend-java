@@ -5,6 +5,9 @@ spring:
     username: postgres
     password: Bangsat@123
     driverClassName: org.postgresql.Driver
+  flyway:
+    enabled: true
+    repair: true
 
   jpa:
     hibernate:
