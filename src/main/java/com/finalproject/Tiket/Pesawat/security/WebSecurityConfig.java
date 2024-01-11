@@ -38,13 +38,14 @@ public class WebSecurityConfig {
         myReqeustCache.setMatchingRequestParameterName(null);
         myReqeustCache.setCreateSessionAllowed(false);
 
-        http.securityContext(context -> context.requireExplicitSave(false))
+        http
+                .securityContext(context -> context.requireExplicitSave(false))
                 .requestCache((cache) -> cache.requestCache(myReqeustCache))
                 .csrf(csrf -> csrf.disable())
                 .exceptionHandling(exception -> exception.authenticationEntryPoint(unauthorizedHandler))
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth ->
-                        auth.requestMatchers("/api/v1/auth/login").permitAll()
+                        auth.requestMatchers("/api/v1/auth/**").permitAll()
                                 .anyRequest()
                                 .authenticated())
         // oauth2 implement here
