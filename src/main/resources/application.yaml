@@ -1,6 +1,6 @@
 spring:
   datasource:
-#    Sesuaikan dengan DB Masing masing
+    #    Sesuaikan dengan DB Masing masing
     url: jdbc:postgresql://localhost:5432/e_flight
     username: postgres
     password:
@@ -40,7 +40,12 @@ spring:
 binar:
   app:
     jwtSecret: 357638792F423F4428472B4B6250655368566D597133743677397A2443264629
-#    NEED DISCUSSION WITH FE TEAM
+    #    NEED DISCUSSION WITH FE TEAM
     jwtExpirationMs: 3600000
     baseUrl: http://localhost:8080/api/
 
+
+cloudinary:
+  cloud_name: drpx4fqwg
+  api_key: 846117517621741
+  api_secret: zRFUUVUQghNgcPAuv5DN7Qqlte0

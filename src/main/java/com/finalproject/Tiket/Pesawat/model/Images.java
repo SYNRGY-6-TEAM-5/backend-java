@@ -2,23 +2,27 @@ package com.finalproject.Tiket.Pesawat.model;
 
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.util.UUID;
 
+@Entity
+@Builder
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-@Entity
-@Table(name = "role")
-public class Role {
+@Table(name = "image")
+public class Images {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
-    @Column(name = "role_id")
+    @Column(name = "image_id")
     private UUID uuid;
 
-    @Enumerated(EnumType.STRING)
-    @Column(name = "role_name")
-    private EnumRole roleName;
+    @Column(name = "name_image")
+    private String name;
+
+    @Column(name = "url_image")
+    private String url;
 }

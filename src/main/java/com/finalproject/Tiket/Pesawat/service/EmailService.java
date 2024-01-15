@@ -6,5 +6,9 @@ import java.util.concurrent.CompletableFuture;
 
 public interface EmailService {
     CompletableFuture<Void> sendEmail(EmailDetails emailDetails);
-    String getOTPLoginEmailTemplate(String email, String name, String otp);
+    String getForgotPasswordEmailTemplate(String email, String name, String otp);
+
+    String getWelcomingMessageEmailTemplate(String email, String name);
+
+    String getRegisterOtpEmailTemplate(String email, String name, String otp);
 }

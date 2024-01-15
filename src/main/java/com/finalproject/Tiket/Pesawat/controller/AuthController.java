@@ -1,25 +1,26 @@
 package com.finalproject.Tiket.Pesawat.controller;
 
 import com.finalproject.Tiket.Pesawat.dto.auth.request.ForgotPasswordRequest;
+import com.finalproject.Tiket.Pesawat.dto.auth.request.SignUpRequest;
 import com.finalproject.Tiket.Pesawat.dto.auth.response.ForgotPasswordResponse;
+import com.finalproject.Tiket.Pesawat.dto.auth.response.ValidSignUpResponse;
 import com.finalproject.Tiket.Pesawat.dto.otp.OTPValidationRequest;
 import com.finalproject.Tiket.Pesawat.dto.otp.response.OTPValidationResponse;
+import com.finalproject.Tiket.Pesawat.dto.otp.response.SignUpResponse;
 import com.finalproject.Tiket.Pesawat.payload.dto.auth.LoginDto;
 import com.finalproject.Tiket.Pesawat.payload.response.JwtResponse;
-import com.finalproject.Tiket.Pesawat.repository.RoleRepository;
-import com.finalproject.Tiket.Pesawat.repository.UserRepository;
 import com.finalproject.Tiket.Pesawat.security.jwt.JwtUtils;
 import com.finalproject.Tiket.Pesawat.security.service.UserDetailsImpl;
 import com.finalproject.Tiket.Pesawat.service.AuthService;
 import com.finalproject.Tiket.Pesawat.service.OTPService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -31,12 +32,7 @@ import java.util.stream.Collectors;
 public class AuthController {
     @Autowired
     private AuthenticationManager authenticationManager;
-    @Autowired
-    private UserRepository userRepository;
-    @Autowired
-    private RoleRepository roleRepository;
-    @Autowired
-    private PasswordEncoder encoder;
+
     @Autowired
     private JwtUtils jwtUtils;
 
@@ -65,6 +61,25 @@ public class AuthController {
                 roles));
     }
 
+
+    // sign up user
+    @PostMapping("/signup")
+    public ResponseEntity<SignUpResponse> signUp(@Valid @RequestBody SignUpRequest signUpRequest){
+        SignUpResponse response = authService.signUpUser(signUpRequest);
+        if (!response.getSuccess()){
+            return ResponseEntity.status(HttpStatus.CONFLICT).body(response);
+        }
+        return ResponseEntity.ok(response);
+    }
+
+    @PostMapping("/signup/validate-otp")
+    public ResponseEntity<Object> signUpvalidateOTP(
+            @RequestBody OTPValidationRequest validationRequest
+    ) {
+        ValidSignUpResponse response = otpService.validateOTPRegister(validationRequest);
+        return ResponseEntity.ok(response);
+    }
+
     @PostMapping("/forgot-password")
     public ResponseEntity<Object> generateOTP(
             @RequestBody ForgotPasswordRequest request
@@ -73,11 +88,12 @@ public class AuthController {
         return ResponseEntity.ok(response);
     }
 
-    @PostMapping("/validate-otp")
-    public ResponseEntity<Object> validateOTP(
+    @PostMapping("/forgot-password/validate-otp")
+    public ResponseEntity<Object> forgotPasswordValidateOTP(
             @RequestBody OTPValidationRequest validationRequest
     ) {
-        OTPValidationResponse response = otpService.validateOTP(validationRequest);
+        OTPValidationResponse response = otpService.validateOTPForgotPassword(validationRequest);
         return ResponseEntity.ok(response);
     }
+
 }

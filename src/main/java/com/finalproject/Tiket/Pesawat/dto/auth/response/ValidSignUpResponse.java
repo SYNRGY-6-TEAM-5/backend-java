@@ -5,14 +5,11 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.util.Date;
-
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class ForgotPasswordResponse {
+public class ValidSignUpResponse {
     private Boolean success;
-    private String otp;
-    private Date expiredOTP;
+    private String message;
 }
