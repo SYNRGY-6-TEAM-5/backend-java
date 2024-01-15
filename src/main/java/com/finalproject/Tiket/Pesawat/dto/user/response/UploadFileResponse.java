@@ -1,18 +1,16 @@
-package com.finalproject.Tiket.Pesawat.dto.auth.response;
+package com.finalproject.Tiket.Pesawat.dto.user.response;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.util.Date;
-
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class ForgotPasswordResponse {
+public class UploadFileResponse {
     private Boolean success;
-    private String otp;
-    private Date expiredOTP;
+    private String message;
+    private String urlImage;
 }

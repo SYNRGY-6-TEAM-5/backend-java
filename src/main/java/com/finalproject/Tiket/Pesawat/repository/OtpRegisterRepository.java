@@ -1,6 +1,6 @@
 package com.finalproject.Tiket.Pesawat.repository;
 
-import com.finalproject.Tiket.Pesawat.model.OtpInfo;
+import com.finalproject.Tiket.Pesawat.model.OtpRegister;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
@@ -10,7 +10,9 @@ import java.util.Optional;
 import java.util.UUID;
 
 @Repository
-public interface OtpRepository extends JpaRepository<OtpInfo, UUID> {
-    Optional<OtpInfo> findByEmailUser(String email);
-    List<OtpInfo> findAllByExpirationDateBefore(Date now);
+public interface OtpRegisterRepository extends JpaRepository<OtpRegister, UUID> {
+    Optional<OtpRegister> findByEmailUser(String email);
+
+    List<OtpRegister> findAllByExpirationDateBefore(Date now);
+
 }

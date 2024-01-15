@@ -23,5 +23,13 @@ class GlobalExceptionHandler {
         response.setMessage(ex.getMessage());
         return new ResponseEntity<>(response, HttpStatus.UNAUTHORIZED);
     }
+
+    @ExceptionHandler(EmailAlreadyRegisteredHandling.class)
+    public ResponseEntity<?> emailAlreadyRegistered(EmailAlreadyRegisteredHandling ex) {
+        ErrorDTO response = new ErrorDTO();
+        response.setMessage("Email Already Registered");
+        return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
+    }
+
 }
 

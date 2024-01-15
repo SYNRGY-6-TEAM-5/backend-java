@@ -1,7 +1,9 @@
 package com.finalproject.Tiket.Pesawat.schedular;
 
-import com.finalproject.Tiket.Pesawat.model.OtpInfo;
-import com.finalproject.Tiket.Pesawat.repository.OtpRepository;
+import com.finalproject.Tiket.Pesawat.model.OtpForgotPassword;
+import com.finalproject.Tiket.Pesawat.model.OtpRegister;
+import com.finalproject.Tiket.Pesawat.repository.OtpForgotPasswordRepository;
+import com.finalproject.Tiket.Pesawat.repository.OtpRegisterRepository;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -15,15 +17,26 @@ import java.util.List;
 public class DeleteExpirationOTP {
 
     @Autowired
-    private OtpRepository otpRepository;
+    private OtpForgotPasswordRepository otpForgotPasswordRepository;
 
-    // todo dibuat constant otp service bisa mengikuti
+    @Autowired
+    private OtpRegisterRepository otpRegisterRepository;
+
     @Scheduled(fixedRate = 60000) // runs every 60 seconds
-    public void deleteExpiredOTPs() {
-        List<OtpInfo> expiredOTPs = otpRepository.findAllByExpirationDateBefore(new Date());
+    public void deleteExpiredOTPForgotPassword() {
+        List<OtpForgotPassword> expiredOTPs = otpForgotPasswordRepository.findAllByExpirationDateBefore(new Date());
         if (!expiredOTPs.isEmpty()){
-            otpRepository.deleteAll(expiredOTPs);
-            log.info("sukses delete otp schedular");
+            otpForgotPasswordRepository.deleteAll(expiredOTPs);
+            log.info("sukses delete otp Forgot Password schedular");
+        }
+    }
+
+    @Scheduled(fixedRate = 60000) // runs every 60 seconds
+    public void deleteExpiredOTPRegister() {
+        List<OtpRegister> expiredOTPs = otpRegisterRepository.findAllByExpirationDateBefore(new Date());
+        if (!expiredOTPs.isEmpty()){
+            otpRegisterRepository.deleteAll(expiredOTPs);
+            log.info("sukses delete otp Register schedular");
         }
     }
 
