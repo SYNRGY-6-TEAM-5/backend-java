@@ -1,10 +1,10 @@
 spring:
   datasource:
     #    Sesuaikan dengan DB Masing masing
-    url:  jdbc:postgresql://roundhouse.proxy.rlwy.net:28519/railway
+    url: jdbc:postgresql://localhost:5432/e_flight
     username: postgres
-    password: G4f5G*GbeDBgcdd53-ABbBfGB-DF22a1
-
+    password:
+    driverClassName: org.postgresql.Driver
   jpa:
     hibernate:
       ddl-auto: update
@@ -16,8 +16,9 @@ spring:
   mail:
     host: smtp.gmail.com
     port: 587
-    username: depanbelakang944@gmail.com
-    password: bglxmoxhroikcpua
+    username: swiftaero290@gmail.com
+    password: bckqfapgzhgbdxfs
+
     properties:
       mail:
         smtp:
