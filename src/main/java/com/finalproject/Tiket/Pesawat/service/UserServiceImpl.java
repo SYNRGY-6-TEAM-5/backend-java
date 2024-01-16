@@ -1,13 +1,12 @@
 package com.finalproject.Tiket.Pesawat.service;
 
-import com.finalproject.Tiket.Pesawat.dto.user.request.UploadFileRequest;
+import com.finalproject.Tiket.Pesawat.dto.user.request.UpdateProfileRequest;
+import com.finalproject.Tiket.Pesawat.dto.user.response.UpdateProfileResponse;
 import com.finalproject.Tiket.Pesawat.dto.user.response.UploadFileResponse;
 import com.finalproject.Tiket.Pesawat.exception.EmailAlreadyRegisteredHandling;
 import com.finalproject.Tiket.Pesawat.exception.ExceptionHandling;
 import com.finalproject.Tiket.Pesawat.exception.UnauthorizedHandling;
-import com.finalproject.Tiket.Pesawat.model.EnumRole;
 import com.finalproject.Tiket.Pesawat.model.Images;
-import com.finalproject.Tiket.Pesawat.model.Role;
 import com.finalproject.Tiket.Pesawat.model.User;
 import com.finalproject.Tiket.Pesawat.repository.RoleRepository;
 import com.finalproject.Tiket.Pesawat.repository.UserRepository;
@@ -106,5 +105,40 @@ public class UserServiceImpl implements UserService {
             return false;
         }
         return true;
+    }
+
+    @Override
+    public UpdateProfileResponse editProfile(UpdateProfileRequest updateProfileRequest) {
+       // get signed
+        try {
+            Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+            Object principal = authentication.getPrincipal();
+
+            if (principal instanceof UserDetailsImpl) {
+                Optional<User> userOptional = userRepository
+                        .findByEmailAddress(((UserDetailsImpl) principal).getUsername());
+                if (userOptional.isEmpty()) {
+                    throw new UnauthorizedHandling("User Not Found");
+                }
+
+                User user = userOptional.get();
+                user.setFullname(updateProfileRequest.getFullName());
+                user.setBirthDate(updateProfileRequest.getDob());
+                user.setPhoneNumber(updateProfileRequest.getPhoneNumber());
+                user.setLastModified(Utils.getCurrentDateTimeAsDate());
+                userRepository.save(user);
+
+            } else if (principal instanceof String) {
+                throw new UnauthorizedHandling("User not authenticated");
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw new ExceptionHandling(e.getMessage());
+        }
+        return UpdateProfileResponse.builder()
+                .success(true)
+                .message("success update profile")
+                .build();
     }
 }
