@@ -1,10 +1,9 @@
 spring:
   datasource:
     #    Sesuaikan dengan DB Masing masing
-    url: jdbc:postgresql://localhost:5432/e_flight
+    url:  jdbc:postgresql://roundhouse.proxy.rlwy.net:28519/railway
     username: postgres
-    password:
-    driverClassName: org.postgresql.Driver
+    password: G4f5G*GbeDBgcdd53-ABbBfGB-DF22a1
 
   jpa:
     hibernate:
@@ -17,8 +16,9 @@ spring:
   mail:
     host: smtp.gmail.com
     port: 587
-    username:
-    password:
+    username: swiftaero290@gmail.com
+    password: bckqfapgzhgbdxfs
+
     properties:
       mail:
         smtp:
@@ -29,13 +29,13 @@ spring:
           timeout: 5000
           writetimeout: 5000
 
-#  security:
-#    oauth2:
-#      client:
-#        registration:
-#          github:
-#            client-id:
-#            client-secret:
+  security:
+    oauth2:
+      client:
+        registration:
+          google:
+            client-id: 724857527525-3kehgvohkiimvhj9vj3pijois33kn1id.apps.googleusercontent.com
+            client-secret: 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
 
 binar:
   app:
