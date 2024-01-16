@@ -3,7 +3,7 @@ spring:
     url: jdbc:postgresql://db.xtpzfhfmldlmexwlchhl.supabase.co:5432/postgres
     username: postgres
     password: pAy*&2Ep%L98ZKq
-    driverClassName: org.postgresql.Drive
+    driverClassName: org.postgresql.Driver
   flyway:
     enabled: true
     repair: true
