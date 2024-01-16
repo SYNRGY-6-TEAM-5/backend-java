@@ -4,10 +4,6 @@ spring:
     username: postgres
     password: pAy*&2Ep%L98ZKq
     driverClassName: org.postgresql.Driver
-  flyway:
-    enabled: true
-    repair: true
-
   jpa:
     hibernate:
       ddl-auto: update

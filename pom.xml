@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 <<<<<<< HEAD
+<<<<<<< HEAD
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	<parent>
@@ -51,6 +52,8 @@
 			<artifactId>spring-boot-starter-web</artifactId>
 		</dependency>
 =======
+=======
+>>>>>>> 7a7f29635e23ec403cf2a4f55f32815bbabe3afc
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <parent>
@@ -119,7 +122,10 @@
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-web</artifactId>
         </dependency>
+<<<<<<< HEAD
 >>>>>>> 8292586 (Create SignUp, Otp SignUp, Welcoming Message, Upload image in user profile ( using cloudinary ))
+=======
+>>>>>>> 7a7f29635e23ec403cf2a4f55f32815bbabe3afc
 
         <dependency>
             <groupId>org.springframework.boot</groupId>
