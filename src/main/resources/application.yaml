@@ -19,8 +19,8 @@ spring:
   mail:
     host: smtp.gmail.com
     port: 587
-    username:
-    password:
+    username: depanbelakang944@gmail.com
+    password: bglxmoxhroikcpua
     properties:
       mail:
         smtp:
@@ -31,13 +31,13 @@ spring:
           timeout: 5000
           writetimeout: 5000
 
-#  security:
-#    oauth2:
-#      client:
-#        registration:
-#          github:
-#            client-id:
-#            client-secret:
+  security:
+    oauth2:
+      client:
+        registration:
+          google:
+            client-id: 724857527525-3kehgvohkiimvhj9vj3pijois33kn1id.apps.googleusercontent.com
+            client-secret: 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
 
 binar:
   app:
