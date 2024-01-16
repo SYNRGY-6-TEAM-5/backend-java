@@ -35,14 +35,15 @@ public class User {
     @Column(name = "is_active")
     private Boolean isActive;
 
-<<<<<<< HEAD
-    @Column(name = "created_at")
-    private Date createdAt;
+    @Column(name = "bitrh_date")
+    @Timestamp
+    @Temporal(TemporalType.TIMESTAMP)
+    private Date birthDate;
 
-    @ManyToOne(fetch = FetchType.EAGER)
-=======
+    @Column(name = "phone_num", length = 15)
+    private int phoneNumber;
+
     @ManyToOne(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
->>>>>>> 8292586 (Create SignUp, Otp SignUp, Welcoming Message, Upload image in user profile ( using cloudinary ))
     @JoinColumn(name = "role_id")
     private Role role;
 
