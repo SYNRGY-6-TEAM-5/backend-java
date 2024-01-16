@@ -1,7 +1,7 @@
 spring:
   datasource:
 #    Sesuaikan dengan DB Masing masing
-    url: jdbc:postgresql://localhost:5432/e_flight
+    url: postgresql://postgres:pAy*&2Ep%L98ZKq@db.xtpzfhfmldlmexwlchhl.supabase.co:5432/postgres
     username: postgres
     password: Bangsat@123
     driverClassName: org.postgresql.Driver
