@@ -14,3 +14,8 @@ This repository contains the backend code for an e-ticket flights system, which 
 - **Framework:** SpringBoot
 - **Database:** PostgreSQL
 - **Authentication:** JWT
+
+## Usage
+
+- **Api Swagger Docs :** /api-docs
+- **Api Swagger Ui :** /api-ui
