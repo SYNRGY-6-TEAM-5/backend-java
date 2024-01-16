@@ -45,6 +45,12 @@
             <artifactId>cloudinary-taglib</artifactId>
             <version>1.36.0</version>
         </dependency>
+        <!--        SWAGGER -->
+        <dependency>
+            <groupId>org.springdoc</groupId>
+            <artifactId>springdoc-openapi-starter-webmvc-ui</artifactId>
+            <version>2.2.0</version>
+        </dependency>
         <dependency>
             <groupId>io.github.cdimascio</groupId>
             <artifactId>dotenv-java</artifactId>

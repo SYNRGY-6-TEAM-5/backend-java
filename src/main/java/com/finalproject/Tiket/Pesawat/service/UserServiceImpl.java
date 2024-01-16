@@ -18,6 +18,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.Optional;
 
@@ -34,7 +35,7 @@ public class UserServiceImpl implements UserService {
     private RoleRepository roleRepository;
 
     @Override
-    public UploadFileResponse uploadFile(UploadFileRequest uploadFileRequest) {
+    public UploadFileResponse uploadFile(String fileName, MultipartFile file) {
         try {
             Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
             Object principal = authentication.getPrincipal();
@@ -48,15 +49,15 @@ public class UserServiceImpl implements UserService {
 
                 log.info("user a " + ((UserDetailsImpl) principal).getUsername());
                 User user = userOptional.get();
-                if (uploadFileRequest.getName().isEmpty()) {
+                if (fileName.isEmpty()) {
                     return null;
                 }
-                if (uploadFileRequest.getFile().isEmpty()) {
+                if (file.isEmpty()) {
                     return null;
                 }
-                String url = cloudinaryService.uploadFile(uploadFileRequest.getFile(), "user-images");
+                String url = cloudinaryService.uploadFile(file, "user-images");
                 Images image = Images.builder()
-                        .name(uploadFileRequest.getName())
+                        .name(fileName)
                         .url(url)
                         .build();
 

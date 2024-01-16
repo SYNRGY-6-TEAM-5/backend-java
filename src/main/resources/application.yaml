@@ -3,7 +3,7 @@ spring:
     #    Sesuaikan dengan DB Masing masing
     url: jdbc:postgresql://localhost:5432/e_flight
     username: postgres
-    password:
+    password: Bangsat@123
     driverClassName: org.postgresql.Driver
   jpa:
     hibernate:
@@ -49,3 +49,10 @@ cloudinary:
   cloud_name: drpx4fqwg
   api_key: 846117517621741
   api_secret: zRFUUVUQghNgcPAuv5DN7Qqlte0
+
+springdoc:
+  api-docs:
+    path: /api-docs
+  swagger-ui:
+    path: /api-ui
+    operations-sorter: method
