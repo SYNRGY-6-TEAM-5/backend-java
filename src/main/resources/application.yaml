@@ -1,9 +1,8 @@
 spring:
   datasource:
-    #    Sesuaikan dengan DB Masing masing
-    url: jdbc:postgresql://localhost:5432/e_flight
+    url: jdbc:postgresql://db.xtpzfhfmldlmexwlchhl.supabase.co:5432/postgres
     username: postgres
-    password:
+    password: pAy*&2Ep%L98ZKq
     driverClassName: org.postgresql.Driver
   jpa:
     hibernate:
@@ -49,3 +48,10 @@ cloudinary:
   cloud_name: drpx4fqwg
   api_key: 846117517621741
   api_secret: zRFUUVUQghNgcPAuv5DN7Qqlte0
+
+springdoc:
+  api-docs:
+    path: /api-docs
+  swagger-ui:
+    path: /api-ui
+    operations-sorter: method

@@ -1,13 +1,12 @@
 package com.finalproject.Tiket.Pesawat.service;
 
-import com.finalproject.Tiket.Pesawat.dto.user.request.UploadFileRequest;
+import com.finalproject.Tiket.Pesawat.dto.user.request.UpdateProfileRequest;
+import com.finalproject.Tiket.Pesawat.dto.user.response.UpdateProfileResponse;
 import com.finalproject.Tiket.Pesawat.dto.user.response.UploadFileResponse;
 import com.finalproject.Tiket.Pesawat.exception.EmailAlreadyRegisteredHandling;
 import com.finalproject.Tiket.Pesawat.exception.ExceptionHandling;
 import com.finalproject.Tiket.Pesawat.exception.UnauthorizedHandling;
-import com.finalproject.Tiket.Pesawat.model.EnumRole;
 import com.finalproject.Tiket.Pesawat.model.Images;
-import com.finalproject.Tiket.Pesawat.model.Role;
 import com.finalproject.Tiket.Pesawat.model.User;
 import com.finalproject.Tiket.Pesawat.repository.RoleRepository;
 import com.finalproject.Tiket.Pesawat.repository.UserRepository;
@@ -18,6 +17,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.Optional;
 
@@ -34,7 +34,7 @@ public class UserServiceImpl implements UserService {
     private RoleRepository roleRepository;
 
     @Override
-    public UploadFileResponse uploadFile(UploadFileRequest uploadFileRequest) {
+    public UploadFileResponse uploadFile(String fileName, MultipartFile file) {
         try {
             Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
             Object principal = authentication.getPrincipal();
@@ -48,15 +48,15 @@ public class UserServiceImpl implements UserService {
 
                 log.info("user a " + ((UserDetailsImpl) principal).getUsername());
                 User user = userOptional.get();
-                if (uploadFileRequest.getName().isEmpty()) {
+                if (fileName.isEmpty()) {
                     return null;
                 }
-                if (uploadFileRequest.getFile().isEmpty()) {
+                if (file.isEmpty()) {
                     return null;
                 }
-                String url = cloudinaryService.uploadFile(uploadFileRequest.getFile(), "user-images");
+                String url = cloudinaryService.uploadFile(file, "user-images");
                 Images image = Images.builder()
-                        .name(uploadFileRequest.getName())
+                        .name(fileName)
                         .url(url)
                         .build();
 
@@ -105,5 +105,40 @@ public class UserServiceImpl implements UserService {
             return false;
         }
         return true;
+    }
+
+    @Override
+    public UpdateProfileResponse editProfile(UpdateProfileRequest updateProfileRequest) {
+       // get signed
+        try {
+            Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+            Object principal = authentication.getPrincipal();
+
+            if (principal instanceof UserDetailsImpl) {
+                Optional<User> userOptional = userRepository
+                        .findByEmailAddress(((UserDetailsImpl) principal).getUsername());
+                if (userOptional.isEmpty()) {
+                    throw new UnauthorizedHandling("User Not Found");
+                }
+
+                User user = userOptional.get();
+                user.setFullname(updateProfileRequest.getFullName());
+                user.setBirthDate(updateProfileRequest.getDob());
+                user.setPhoneNumber(updateProfileRequest.getPhoneNumber());
+                user.setLastModified(Utils.getCurrentDateTimeAsDate());
+                userRepository.save(user);
+
+            } else if (principal instanceof String) {
+                throw new UnauthorizedHandling("User not authenticated");
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw new ExceptionHandling(e.getMessage());
+        }
+        return UpdateProfileResponse.builder()
+                .success(true)
+                .message("success update profile")
+                .build();
     }
 }

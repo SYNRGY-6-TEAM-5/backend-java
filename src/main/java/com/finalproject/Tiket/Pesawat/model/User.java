@@ -35,6 +35,14 @@ public class User {
     @Column(name = "is_active")
     private Boolean isActive;
 
+    @Column(name = "bitrh_date")
+    @Timestamp
+    @Temporal(TemporalType.TIMESTAMP)
+    private Date birthDate;
+
+    @Column(name = "phone_num")
+    private Long phoneNumber;
+
     @ManyToOne(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
     @JoinColumn(name = "role_id")
     private Role role;
@@ -47,4 +55,10 @@ public class User {
     @Timestamp
     @Temporal(TemporalType.TIMESTAMP)
     private Date createdAt;
+
+    @Column
+    @Timestamp
+    @Temporal(TemporalType.TIMESTAMP)
+    private Date lastModified;
+
 }
