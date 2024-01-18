@@ -12,10 +12,6 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class SignUpRequest {
 
-    @NotEmpty(message = "Fullname is required.")
-    @NotBlank(message = "Fullname cannot be blank.")
-    private String fullName;
-
     @NotEmpty(message = "Email is required.")
     @NotBlank(message = "Email cannot be blank.")
     private String email;
