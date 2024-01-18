@@ -1,9 +1,17 @@
+# DB ONLINE
 spring:
   datasource:
     url: jdbc:postgresql://db.xtpzfhfmldlmexwlchhl.supabase.co:5432/postgres
     username: postgres
     password: pAy*&2Ep%L98ZKq
     driverClassName: org.postgresql.Driver
+# DB offline
+#spring:
+#  datasource:
+#    url: jdbc:postgresql://localhost:5432/e_flight
+#    username: postgres
+#    password: Bangsat@123
+#    driverClassName: org.postgresql.Driver
   flyway:
     enabled: true
     repair: true
@@ -13,8 +21,6 @@ spring:
     properties:
       hibernate:
         dialect: org.hibernate.dialect.PostgreSQLDialect
-
-
   mail:
     host: smtp.gmail.com
     port: 587
@@ -42,7 +48,6 @@ spring:
 binar:
   app:
     jwtSecret: 357638792F423F4428472B4B6250655368566D597133743677397A2443264629
-    #    NEED DISCUSSION WITH FE TEAM
     jwtExpirationMs: 3600000
     baseUrl: http://localhost:8080/api/
 

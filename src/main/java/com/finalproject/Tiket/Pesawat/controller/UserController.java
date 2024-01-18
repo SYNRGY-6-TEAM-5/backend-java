@@ -30,11 +30,14 @@ public class UserController {
         return userService.uploadFile(fileName, file);
     }
 
+    @PutMapping(value = "/profile-image", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public UploadFileResponse editFileResponse(@RequestPart(name = "file") MultipartFile file) {
+        return userService.editFile(file);
+    }
+
     @PutMapping("/profile")
     public UpdateProfileResponse updateProfileResponse(@RequestBody UpdateProfileRequest updateProfileRequest) {
-
         return userService.editProfile(updateProfileRequest);
-
     }
 
 
