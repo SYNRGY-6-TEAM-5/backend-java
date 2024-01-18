@@ -62,34 +62,33 @@ public class WebSecurityConfig {
                                         "/webjars/**", "/v3/api-docs/**", "/configuration/ui"
                                 ).permitAll()
                                 .requestMatchers("/api/v1/auth/**").permitAll()
-//                                .requestMatchers("/**").permitAll()
                                 .anyRequest()
                                 .authenticated())
                 .httpBasic(basic -> basic.authenticationEntryPoint(unauthorizedHandler))
                 .exceptionHandling(Customizer.withDefaults())
-                .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-                .oauth2Login(oauth ->
-                                oauth.successHandler((request, response, authentication) -> {
-                                            DefaultOidcUser oidcUser = (DefaultOidcUser) authentication.getPrincipal();
-//                                    Optional<Role> optionalUserRole = roleRepository.findByRoleName(EnumRole.USER);
-
-                                            User user = User.builder()
-                                                    .emailAddress(oidcUser.getAttribute("email"))
-                                                    .fullname(oidcUser.getAttribute("name"))
-                                                    .isActive(true)
-//                                            .role(optionalUserRole.get())
-                                                    .build();
-                                            Boolean saveUser = userService.saveNewUserFromOauth2(user, oidcUser.getAttribute("picture"));
-
-                                            if (saveUser) {
-                                                log.info("sukses create user");
-                                            } else {
-                                                log.info("failed create user");
-                                            }
-                                            log.info(oidcUser.getAttribute("name") + " " + oidcUser.getAttribute("email"));
-                                        })
-                                        .defaultSuccessUrl("/api/v1/auth/user", true) // todo handle redirect URL
-                );
+                .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
+//                .oauth2Login(oauth ->
+//                                oauth.successHandler((request, response, authentication) -> {
+//                                            DefaultOidcUser oidcUser = (DefaultOidcUser) authentication.getPrincipal();
+////                                    Optional<Role> optionalUserRole = roleRepository.findByRoleName(EnumRole.USER);
+//
+//                                            User user = User.builder()
+//                                                    .emailAddress(oidcUser.getAttribute("email"))
+//                                                    .fullname(oidcUser.getAttribute("name"))
+//                                                    .isActive(true)
+////                                            .role(optionalUserRole.get())
+//                                                    .build();
+//                                            Boolean saveUser = userService.saveNewUserFromOauth2(user, oidcUser.getAttribute("picture"));
+//
+//                                            if (saveUser) {
+//                                                log.info("sukses create user");
+//                                            } else {
+//                                                log.info("failed create user");
+//                                            }
+//                                            log.info(oidcUser.getAttribute("name") + " " + oidcUser.getAttribute("email"));
+//                                        })
+//                                        .defaultSuccessUrl("/api/v1/auth/user", true) // todo handle redirect URL
+//                );
 
         http.authenticationProvider(authenticationProvider());
         http.addFilterBefore(authJwtTokenFilter(), UsernamePasswordAuthenticationFilter.class);
