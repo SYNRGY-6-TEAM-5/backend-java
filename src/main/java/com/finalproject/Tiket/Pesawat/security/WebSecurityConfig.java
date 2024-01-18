@@ -57,14 +57,12 @@ public class WebSecurityConfig {
                 .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(auth ->
                         auth
-                                .requestMatchers("/login/**").permitAll()
-                                .requestMatchers("/error/**").permitAll()
-                                .requestMatchers("/api-docs").permitAll()
-                                .requestMatchers("/api-ui").permitAll()
-                                .requestMatchers("/swagger-resources/**").permitAll()
-                                .requestMatchers("/webjars/**").permitAll()
-                                .requestMatchers("/swagger-ui.html").permitAll()
+                                .requestMatchers("/login/**", "/error/**", "/api-docs/**", "/api-ui/**",
+                                        "swagger-ui/**", "/swagger-resources/**", "/swagger-resources",
+                                        "/webjars/**", "/v3/api-docs/**", "/configuration/ui"
+                                ).permitAll()
                                 .requestMatchers("/api/v1/auth/**").permitAll()
+//                                .requestMatchers("/**").permitAll()
                                 .anyRequest()
                                 .authenticated())
                 .httpBasic(basic -> basic.authenticationEntryPoint(unauthorizedHandler))
@@ -72,24 +70,24 @@ public class WebSecurityConfig {
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .oauth2Login(oauth ->
                                 oauth.successHandler((request, response, authentication) -> {
-                                    DefaultOidcUser oidcUser = (DefaultOidcUser) authentication.getPrincipal();
+                                            DefaultOidcUser oidcUser = (DefaultOidcUser) authentication.getPrincipal();
 //                                    Optional<Role> optionalUserRole = roleRepository.findByRoleName(EnumRole.USER);
 
-                                    User user = User.builder()
-                                            .emailAddress(oidcUser.getAttribute("email"))
-                                            .fullname(oidcUser.getAttribute("name"))
-                                            .isActive(true)
+                                            User user = User.builder()
+                                                    .emailAddress(oidcUser.getAttribute("email"))
+                                                    .fullname(oidcUser.getAttribute("name"))
+                                                    .isActive(true)
 //                                            .role(optionalUserRole.get())
-                                            .build();
-                                    Boolean saveUser = userService.saveNewUserFromOauth2(user, oidcUser.getAttribute("picture"));
+                                                    .build();
+                                            Boolean saveUser = userService.saveNewUserFromOauth2(user, oidcUser.getAttribute("picture"));
 
-                                    if (saveUser) {
-                                        log.info("sukses create user");
-                                    } else {
-                                        log.info("failed create user");
-                                    }
-                                    log.info(oidcUser.getAttribute("name") + " " + oidcUser.getAttribute("email"));
-                                })
+                                            if (saveUser) {
+                                                log.info("sukses create user");
+                                            } else {
+                                                log.info("failed create user");
+                                            }
+                                            log.info(oidcUser.getAttribute("name") + " " + oidcUser.getAttribute("email"));
+                                        })
                                         .defaultSuccessUrl("/api/v1/auth/user", true) // todo handle redirect URL
                 );
 

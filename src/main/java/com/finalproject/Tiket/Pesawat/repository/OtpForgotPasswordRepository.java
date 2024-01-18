@@ -13,4 +13,5 @@ import java.util.UUID;
 public interface OtpForgotPasswordRepository extends JpaRepository<OtpForgotPassword, UUID> {
     Optional<OtpForgotPassword> findByEmailUser(String email);
     List<OtpForgotPassword> findAllByExpirationDateBefore(Date now);
+
 }
