@@ -43,7 +43,7 @@ public class CloudinaryServiceImpl implements CloudinaryService {
             Map<String, String> options = new HashMap<>();
             options.put("public_id", publicId);
             options.put("overwrite", "true");
-            Map uploadedFile = cloudinary.uploader().upload(file.getBytes(), options);
+            cloudinary.uploader().upload(file.getBytes(), options);
             return cloudinary.url().secure(true).generate(publicId);
 
         } catch (IOException e) {
