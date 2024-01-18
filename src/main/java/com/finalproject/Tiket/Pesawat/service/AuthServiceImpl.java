@@ -39,7 +39,8 @@ public class AuthServiceImpl implements AuthService {
         User user = userOptional.get();
         // otp send
         OtpForgotPassword otp = otpService.generateOTPForgotPassword(request.getEmail());
-        CompletableFuture<Boolean> sendOtpFuture = otpService.sendOTPByEmailForgotPassword(request.getEmail(), user.getFullname(), otp.getOtp());
+        CompletableFuture<Boolean> sendOtpFuture = otpService.
+                sendOTPByEmailForgotPassword(request.getEmail(), user.getFullname(), otp.getOtp());
         try {
 
             boolean otpSent = sendOtpFuture.get();

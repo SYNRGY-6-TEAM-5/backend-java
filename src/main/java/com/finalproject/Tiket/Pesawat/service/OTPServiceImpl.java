@@ -46,13 +46,19 @@ public class OTPServiceImpl implements OTPService {
     @Autowired
     private UserRepository userRepository;
 
-    private static final long OTP_EXPIRATION_DURATION = 1 * 60 * 1000; // 1 minutes // todo discuss with FE
+    private static final long OTP_EXPIRATION_DURATION = 5 * 60 * 1000; // 5 minutes
 
     @Override
     public OtpForgotPassword generateOTPForgotPassword(String email) {
         Random random = new Random();
-        int otpValue = 100_000 + random.nextInt(900_000);
+        int otpValue = 1000 + random.nextInt(9000);
         String otp = String.valueOf(otpValue);
+
+        Optional<OtpForgotPassword> otpInfoOptional = otpForgotPasswordRepository.findByEmailUser(email);
+        if (otpInfoOptional.isPresent()){
+            throw new UnauthorizedHandling("An OTP has already been sent to your email. " +
+                    "Please check your inbox before requesting a new one.");
+        }
 
         OtpForgotPassword otpForgotPassword = new OtpForgotPassword();
         otpForgotPassword.setEmailUser(email);
@@ -68,8 +74,8 @@ public class OTPServiceImpl implements OTPService {
     @Override
     @Async
     public CompletableFuture<Boolean> sendOTPByEmailForgotPassword(String email, String name, String otp) {
-        String subject = "OTP Verification";
-        String msgBody = emailService.getForgotPasswordEmailTemplate(email, name, otp);
+        String subject = "OTP Verification Forgot Password";
+        String msgBody = emailService.getForgotPasswordEmailTemplate(name, otp);
 
         EmailDetails emailDetails = new EmailDetails();
 
@@ -82,6 +88,7 @@ public class OTPServiceImpl implements OTPService {
             return false;
         });
     }
+
 
     @Override
     public OTPValidationResponse validateOTPForgotPassword(OTPValidationRequest validationRequest) {
@@ -102,21 +109,53 @@ public class OTPServiceImpl implements OTPService {
         }
 
         if (otpForgotPassword.getEmailUser().equals(validationRequest.getEmail()) && otpForgotPassword.getOtp().equals(validationRequest.getOtp())) {
-            // OTP is correct
             otpForgotPasswordRepository.delete(otpForgotPassword);
-            response.setStatus(true);
-            response.setMessage("Success Validate OTP");
-            return response;
+
+            Optional<User> newUserPw = userRepository.findByEmailAddress(validationRequest.getEmail());
+            if (newUserPw.isEmpty()){
+                throw new ExceptionHandling("Email Not Registered");
+            }
+            User user = newUserPw.get();
+            CompletableFuture<String> newPasswordFuture = Utils.generateRandomPasswordAsync();
+
+            return newPasswordFuture.thenApply(newPassword -> {
+                user.setPassword(passwordEncoder.encode(newPassword));
+                userRepository.save(user);
+
+                String subject = "Your New Password"; // todo msg utils
+                String msgBody = emailService.getForgotSendPassword(
+                        user.getEmailAddress(), newPassword);
+
+                EmailDetails emailDetails = EmailDetails.builder()
+                        .subject(subject)
+                        .recipient(user.getEmailAddress())
+                        .msgBody(msgBody)
+                        .build();
+
+                return emailService.sendEmail(emailDetails);
+            }).thenApplyAsync(result -> {
+                response.setStatus(true);
+                response.setMessage("Success Validate OTP and Your New Password Was Sent to Email");
+                return response;
+            }).exceptionally(ex -> {
+                ex.printStackTrace();
+                throw new UnauthorizedHandling("Failed to send email");
+            }).join();
         } else {
-            // Wrong OTP
             throw new UnauthorizedHandling("Wrong OTP");
         }
     }
 
     @Override
     public OtpRegister generateOTPRegister(String email, String password, String fullName) {
+        Optional<OtpRegister> otpInfoOptional = otpRegisterRepository.findByEmailUser(email);
+        if (otpInfoOptional.isPresent()){
+            throw new UnauthorizedHandling("An OTP has already been sent to your email. " +
+                    "Please check your inbox before requesting a new one.");
+        }
+
         Random random = new Random();
-        int otpValue = 100_000 + random.nextInt(900_000);
+        int otpValue = 1000 + random.nextInt(9000);
         String otp = String.valueOf(otpValue);
         String encryptedPassword = passwordEncoder.encode(password);
 
@@ -136,7 +175,7 @@ public class OTPServiceImpl implements OTPService {
 
     @Override
     public CompletableFuture<Boolean> sendOTPByEmailRegister(String email, String name, String otp) {
-        String subject = "OTP Verification";
+        String subject = "OTP Verification For Register"; // todo message util
         String msgBody = emailService.getRegisterOtpEmailTemplate(email, name, otp);
 
         EmailDetails emailDetails = EmailDetails.builder()
@@ -188,10 +227,9 @@ public class OTPServiceImpl implements OTPService {
 
             userRepository.save(newUser);
 
-            // WELCOMING MESSAGE HERE
             String subject = "Welcome User";
             String msgBody = emailService.getWelcomingMessageEmailTemplate(
-                    otpRegister.getEmailUser(), otpRegister.getFullName()
+                    otpRegister.getFullName()
             );
 
             EmailDetails emailDetails = EmailDetails.builder()
