@@ -17,5 +17,5 @@ This repository contains the backend code for an e-ticket flights system, which 
 
 ## Usage
 
-- **Api Swagger Docs :** /api-docs
-- **Api Swagger Ui :** /api-ui
+- **Api Swagger Docs :** https://backend-java-production-ece2.up.railway.app/api-docs
+- **Api Swagger Ui :** https://backend-java-production-ece2.up.railway.app/api-ui
