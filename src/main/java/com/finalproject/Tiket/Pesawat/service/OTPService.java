@@ -15,9 +15,9 @@ public interface OTPService {
 
     OTPValidationResponse validateOTPForgotPassword(OTPValidationRequest validationRequest);
 
-    OtpRegister generateOTPRegister(String email, String password, String fullName);
+    OtpRegister generateOTPRegister(String email, String password);
 
-    CompletableFuture<Boolean> sendOTPByEmailRegister(String email, String name, String otp);
+    CompletableFuture<Boolean> sendOTPByEmailRegister(String email,String otp);
 
     ValidSignUpResponse validateOTPRegister(OTPValidationRequest validationRequest);
 }

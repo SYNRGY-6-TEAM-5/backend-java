@@ -10,7 +10,7 @@ public interface EmailService {
 
     String getWelcomingMessageEmailTemplate(String name);
 
-    String getRegisterOtpEmailTemplate(String email, String name, String otp);
+    String getRegisterOtpEmailTemplate(String email, String otp);
 
     String getForgotSendPassword(String emailAddress, String newPassword);
 }

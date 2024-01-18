@@ -147,7 +147,7 @@ public class OTPServiceImpl implements OTPService {
     }
 
     @Override
-    public OtpRegister generateOTPRegister(String email, String password, String fullName) {
+    public OtpRegister generateOTPRegister(String email, String password) {
         Optional<OtpRegister> otpInfoOptional = otpRegisterRepository.findByEmailUser(email);
         if (otpInfoOptional.isPresent()){
             throw new UnauthorizedHandling("An OTP has already been sent to your email. " +
@@ -162,7 +162,7 @@ public class OTPServiceImpl implements OTPService {
         OtpRegister otpRegister = OtpRegister.builder()
                 .emailUser(email)
                 .otp(otp)
-                .fullName(fullName)
+//                .fullName(fullName)
                 .password(encryptedPassword)
                 .generateDate(getCurrentDateTimeAsDate())
                 .expirationDate(new Date(System.currentTimeMillis() + OTP_EXPIRATION_DURATION))
@@ -174,9 +174,9 @@ public class OTPServiceImpl implements OTPService {
 
 
     @Override
-    public CompletableFuture<Boolean> sendOTPByEmailRegister(String email, String name, String otp) {
+    public CompletableFuture<Boolean> sendOTPByEmailRegister(String email, String otp) {
         String subject = "OTP Verification For Register"; // todo message util
-        String msgBody = emailService.getRegisterOtpEmailTemplate(email, name, otp);
+        String msgBody = emailService.getRegisterOtpEmailTemplate(email, otp);
 
         EmailDetails emailDetails = EmailDetails.builder()
                 .subject(subject)

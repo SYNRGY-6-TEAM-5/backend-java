@@ -58,10 +58,6 @@ cloudinary:
   api_secret: zRFUUVUQghNgcPAuv5DN7Qqlte0
 
 springdoc:
-#  api-docs:
-#    path: /api-docs
-#  swagger-ui:
-#    path: /api-ui
     operations-sorter: method
 
 aeroswift:

@@ -17,7 +17,7 @@ import java.util.List;
 
 @Configuration
 @OpenAPIDefinition(
-        info = @Info(title = "My API", version = "v1"),
+        info = @Info(title = "AeroSwift API", version = "v1"),
         security = @SecurityRequirement(name = "Bearer Authentication")
 )
 @SecuritySchemes({

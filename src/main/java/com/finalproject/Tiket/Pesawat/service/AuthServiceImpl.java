@@ -68,11 +68,11 @@ public class AuthServiceImpl implements AuthService {
 
         try {
             OtpRegister otpRegister = otpService.generateOTPRegister(signUpRequest.getEmail(),
-                    signUpRequest.getPassword(), signUpRequest.getFullName());
+                    signUpRequest.getPassword());
 
             CompletableFuture<Boolean> sendOtpFuture =
                     otpService.sendOTPByEmailRegister(signUpRequest.getEmail(),
-                            signUpRequest.getFullName(), otpRegister.getOtp());
+                             otpRegister.getOtp());
             boolean otpSent = sendOtpFuture.get();
             if (otpSent) {
                 return SignUpResponse.builder()

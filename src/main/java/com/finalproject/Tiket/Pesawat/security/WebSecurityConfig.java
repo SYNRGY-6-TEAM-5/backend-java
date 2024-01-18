@@ -1,7 +1,6 @@
 package com.finalproject.Tiket.Pesawat.security;
 
 
-import com.finalproject.Tiket.Pesawat.model.User;
 import com.finalproject.Tiket.Pesawat.repository.RoleRepository;
 import com.finalproject.Tiket.Pesawat.security.jwt.AuthEntryPointJwt;
 import com.finalproject.Tiket.Pesawat.security.jwt.AuthTokenFilter;
@@ -22,7 +21,6 @@ import org.springframework.security.config.annotation.web.configurers.AbstractHt
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.security.oauth2.core.oidc.user.DefaultOidcUser;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.security.web.savedrequest.HttpSessionRequestCache;
@@ -52,14 +50,13 @@ public class WebSecurityConfig {
         myReqeustCache.setCreateSessionAllowed(false);
 
 
-
         http
                 .securityContext(context -> context.requireExplicitSave(false))
                 .requestCache((cache) -> cache.requestCache(myReqeustCache))
                 .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(auth ->
                         auth
-                                .requestMatchers("/login/**", "/error/**", "/api-docs/**", "/api-ui/**",
+                                .requestMatchers("/login/**", "/error/**",
                                         "swagger-ui/**", "/swagger-resources/**", "/swagger-resources",
                                         "/webjars/**", "/v3/api-docs/**", "/configuration/ui"
                                 ).permitAll()
