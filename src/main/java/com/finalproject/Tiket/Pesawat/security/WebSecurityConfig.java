@@ -51,6 +51,8 @@ public class WebSecurityConfig {
         myReqeustCache.setMatchingRequestParameterName(null);
         myReqeustCache.setCreateSessionAllowed(false);
 
+
+
         http
                 .securityContext(context -> context.requireExplicitSave(false))
                 .requestCache((cache) -> cache.requestCache(myReqeustCache))

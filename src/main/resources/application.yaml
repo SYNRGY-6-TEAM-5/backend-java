@@ -58,8 +58,15 @@ cloudinary:
   api_secret: zRFUUVUQghNgcPAuv5DN7Qqlte0
 
 springdoc:
-  api-docs:
-    path: /api-docs
-  swagger-ui:
-    path: /api-ui
+#  api-docs:
+#    path: /api-docs
+#  swagger-ui:
+#    path: /api-ui
     operations-sorter: method
+
+aeroswift:
+  openapi:
+    dev-url: https://backend-java-production-ece2.up.railway.app
+#    dev-url: http://localhost:8080
+
+
