@@ -28,7 +28,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-@CrossOrigin(origins = "*", maxAge = 3600)
 @RestController
 @RequestMapping("/api/v1/auth")
 public class AuthController {
@@ -101,12 +100,12 @@ public class AuthController {
 
     // OAUTH2
     // todo handle success or error
-    @GetMapping("/user")
-    public Map<String, Object> userOauth2() {
-        Map<String, Object> response = new HashMap<>();
-
-        response.put("message", "success register with oauth2");
-        return response;
-    }
+//    @GetMapping("/user")
+//    public Map<String, Object> userOauth2() {
+//        Map<String, Object> response = new HashMap<>();
+//
+//        response.put("message", "success register with oauth2");
+//        return response;
+//    }
 
 }

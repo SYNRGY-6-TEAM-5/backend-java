@@ -9,8 +9,10 @@ import org.springframework.web.multipart.MultipartFile;
 public interface UserService {
 
     UploadFileResponse uploadFile(String fileName, MultipartFile file);
+    UploadFileResponse editFile(MultipartFile file);
 
     Boolean saveNewUserFromOauth2(User user, String imageUrl);
 
     UpdateProfileResponse editProfile(UpdateProfileRequest updateProfileRequest);
+
 }

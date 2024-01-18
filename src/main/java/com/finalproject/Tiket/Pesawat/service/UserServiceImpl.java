@@ -1,5 +1,6 @@
 package com.finalproject.Tiket.Pesawat.service;
 
+import com.cloudinary.utils.StringUtils;
 import com.finalproject.Tiket.Pesawat.dto.user.request.UpdateProfileRequest;
 import com.finalproject.Tiket.Pesawat.dto.user.response.UpdateProfileResponse;
 import com.finalproject.Tiket.Pesawat.dto.user.response.UploadFileResponse;
@@ -82,6 +83,56 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    public UploadFileResponse editFile(MultipartFile file) {
+        try {
+            Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+            Object principal = authentication.getPrincipal();
+
+            if (principal instanceof UserDetailsImpl) {
+                Optional<User> userOptional = userRepository
+                        .findByEmailAddress(((UserDetailsImpl) principal).getUsername());
+                if (userOptional.isEmpty()) {
+                    throw new UnauthorizedHandling("User Not Found");
+                }
+                User user = userOptional.get();
+
+                if (user.getImages() == null || StringUtils.isEmpty(user.getImages().getUrl())) {
+                    throw new ExceptionHandling("User does not have a profile image");
+                }
+                // Extract public_id from the Cloudinary URL
+                String publicId = Utils.extractPublicId(user.getImages().getUrl());
+                if (file.isEmpty()) {
+                    throw new UnauthorizedHandling("Error Uploading File");
+                }
+                String url = cloudinaryService.editFile(file, publicId);
+                if (url == null) {
+                    throw new ExceptionHandling("Error editing file");
+                }
+//                Images image = Images.builder()
+//                        .name(user.getImages().getName())
+//                        .url(url)
+//                        .build();
+//
+//                user.setImages(image);
+//                userRepository.save(user);
+
+                return UploadFileResponse.builder()
+                        .success(true)
+                        .urlImage(url)
+                        .message("Success upload image")
+                        .build();
+            } else if (principal instanceof String) {
+                throw new UnauthorizedHandling("User not authenticated");
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw new ExceptionHandling(e.getMessage());
+        }
+
+        throw new UnauthorizedHandling("Unknown principal type");
+    }
+    @Override
     public Boolean saveNewUserFromOauth2(User user, String imageUrl) {
         try {
             Optional<User> userOptional = userRepository.findByEmailAddress(user.getEmailAddress());
@@ -141,4 +192,6 @@ public class UserServiceImpl implements UserService {
                 .message("success update profile")
                 .build();
     }
+
+
 }

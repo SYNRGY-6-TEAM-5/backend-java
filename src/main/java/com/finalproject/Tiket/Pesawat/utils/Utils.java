@@ -25,4 +25,9 @@ public class Utils {
             return password.toString();
         });
     }
+
+    public static String extractPublicId(String cloudinaryUrl) {
+        String[] parts = cloudinaryUrl.split("/");
+        return parts[parts.length - 2];
+    }
 }
