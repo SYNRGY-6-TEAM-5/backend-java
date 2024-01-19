@@ -1,4 +1,4 @@
-package com.finalproject.Tiket.Pesawat.dto.otp.response;
+package com.finalproject.Tiket.Pesawat.dto.auth.response;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -9,8 +9,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class OTPValidationResponse {
+public class ResponseEditPassword {
     private Boolean status;
     private String message;
-    private String token;
 }

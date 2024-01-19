@@ -1,12 +1,15 @@
 package com.finalproject.Tiket.Pesawat.controller;
 
 import com.finalproject.Tiket.Pesawat.dto.auth.request.ForgotPasswordRequest;
+import com.finalproject.Tiket.Pesawat.dto.auth.request.RequestEditUser;
 import com.finalproject.Tiket.Pesawat.dto.auth.request.SignUpRequest;
 import com.finalproject.Tiket.Pesawat.dto.auth.response.ForgotPasswordResponse;
+import com.finalproject.Tiket.Pesawat.dto.auth.response.ResponseEditPassword;
 import com.finalproject.Tiket.Pesawat.dto.auth.response.ValidSignUpResponse;
 import com.finalproject.Tiket.Pesawat.dto.otp.OTPValidationRequest;
 import com.finalproject.Tiket.Pesawat.dto.otp.response.OTPValidationResponse;
 import com.finalproject.Tiket.Pesawat.dto.otp.response.SignUpResponse;
+import com.finalproject.Tiket.Pesawat.exception.UnauthorizedHandling;
 import com.finalproject.Tiket.Pesawat.payload.dto.auth.LoginDto;
 import com.finalproject.Tiket.Pesawat.payload.response.JwtResponse;
 import com.finalproject.Tiket.Pesawat.security.jwt.JwtUtils;
@@ -18,13 +21,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -46,22 +47,27 @@ public class AuthController {
 
     @PostMapping("/login")
     public ResponseEntity<?> login(@Valid @RequestBody LoginDto loginDto) {
-        Authentication authentication = authenticationManager.authenticate(
-                new UsernamePasswordAuthenticationToken(loginDto.getEmailAddress(), loginDto.getPassword()));
+        try {
+            Authentication authentication = authenticationManager.authenticate(
+                    new UsernamePasswordAuthenticationToken(loginDto.getEmailAddress(), loginDto.getPassword()));
 
-        SecurityContextHolder.getContext().setAuthentication(authentication);
-        String jwt = jwtUtils.generateToken(authentication);
+            SecurityContextHolder.getContext().setAuthentication(authentication);
+            String jwt = jwtUtils.generateToken(authentication);
 
-        UserDetailsImpl userDetails = (UserDetailsImpl) authentication.getPrincipal();
+            UserDetailsImpl userDetails = (UserDetailsImpl) authentication.getPrincipal();
 
-        List<String> roles = userDetails.getAuthorities().stream()
-                .map(item -> item.getAuthority())
-                .collect(Collectors.toList());
+            List<String> roles = userDetails.getAuthorities().stream()
+                    .map(item -> item.getAuthority())
+                    .collect(Collectors.toList());
 
-        return ResponseEntity.ok(new JwtResponse(jwt,
-                userDetails.getUsername(),
-                roles));
+            return ResponseEntity.ok(new JwtResponse(jwt,
+                    userDetails.getUsername(),
+                    roles));
+        } catch (BadCredentialsException e) {
+            throw new UnauthorizedHandling("Failed Login, Wrong Email or Password");
+        }
     }
+
 
 
     // sign up user
@@ -97,6 +103,15 @@ public class AuthController {
         OTPValidationResponse response = otpService.validateOTPForgotPassword(validationRequest);
         return ResponseEntity.ok(response);
     }
+
+    @PutMapping("/forgot-password/edit-password")
+    public ResponseEntity<Object> editPasswordUser(
+            @Valid @RequestBody RequestEditUser requestEditUser
+    ) {
+        ResponseEditPassword response = authService.editPassUser(requestEditUser);
+        return ResponseEntity.ok(response);
+    }
+
 
 
     // OAUTH2
