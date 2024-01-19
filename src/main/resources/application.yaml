@@ -1,17 +1,17 @@
 # DB ONLINE
+spring:
+  datasource:
+    url: jdbc:postgresql://db.xtpzfhfmldlmexwlchhl.supabase.co:5432/postgres
+    username: postgres
+    password: pAy*&2Ep%L98ZKq
+    driverClassName: org.postgresql.Driver
+
 #spring:
 #  datasource:
-#    url: jdbc:postgresql://db.xtpzfhfmldlmexwlchhl.supabase.co:5432/postgres
+#    url: jdbc:postgresql://localhost:5432/e_flight
 #    username: postgres
-#    password: pAy*&2Ep%L98ZKq
+#    password: Bangsat@123
 #    driverClassName: org.postgresql.Driver
-# DB offline
-#spring:
-  datasource:
-    url: jdbc:postgresql://localhost:5432/e_flight
-    username: postgres
-    password: Bangsat@123
-    driverClassName: org.postgresql.Driver
   flyway:
     enabled: true
     repair: true
@@ -26,8 +26,6 @@
     port: 587
     username: swiftaero290@gmail.com
     password: bckqfapgzhgbdxfs
-
-
     properties:
       mail:
         smtp:
@@ -37,7 +35,6 @@
           connectiontimeout: 5000
           timeout: 5000
           writetimeout: 5000
-
   security:
     oauth2:
       client:
@@ -45,13 +42,11 @@
           google:
             client-id: 724857527525-3kehgvohkiimvhj9vj3pijois33kn1id.apps.googleusercontent.com
             client-secret: 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
-
 binar:
   app:
     jwtSecret: 357638792F423F4428472B4B6250655368566D597133743677397A2443264629
     jwtExpirationMs: 3600000
     baseUrl: http://localhost:8080/api/
-
 
 cloudinary:
   cloud_name: drpx4fqwg
@@ -59,15 +54,13 @@ cloudinary:
   api_secret: zRFUUVUQghNgcPAuv5DN7Qqlte0
 
 springdoc:
-    operations-sorter: method
+  operations-sorter: method
 
 aeroswift:
   openapi:
     dev-url: https://backend-java-production-ece2.up.railway.app
-#    dev-url: http://localhost:8080
+
 server:
   error:
     include-binding-errors: always
     include-message: always
-
-

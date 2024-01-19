@@ -1,18 +1,26 @@
 package com.finalproject.Tiket.Pesawat.service;
 
 import com.finalproject.Tiket.Pesawat.dto.auth.request.ForgotPasswordRequest;
+import com.finalproject.Tiket.Pesawat.dto.auth.request.RequestEditUser;
 import com.finalproject.Tiket.Pesawat.dto.auth.request.SignUpRequest;
 import com.finalproject.Tiket.Pesawat.dto.auth.response.ForgotPasswordResponse;
+import com.finalproject.Tiket.Pesawat.dto.auth.response.ResponseEditPassword;
 import com.finalproject.Tiket.Pesawat.dto.otp.response.SignUpResponse;
 import com.finalproject.Tiket.Pesawat.exception.EmailAlreadyRegisteredHandling;
 import com.finalproject.Tiket.Pesawat.exception.ExceptionHandling;
+import com.finalproject.Tiket.Pesawat.exception.UnauthorizedHandling;
 import com.finalproject.Tiket.Pesawat.model.OtpForgotPassword;
 import com.finalproject.Tiket.Pesawat.model.OtpRegister;
 import com.finalproject.Tiket.Pesawat.model.User;
 import com.finalproject.Tiket.Pesawat.repository.UserRepository;
+import com.finalproject.Tiket.Pesawat.security.service.UserDetailsImpl;
+import com.finalproject.Tiket.Pesawat.utils.Utils;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Async;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.Optional;
@@ -27,6 +35,10 @@ public class AuthServiceImpl implements AuthService {
 
     @Autowired
     private OTPService otpService;
+
+    @Autowired
+    private PasswordEncoder passwordEncoder;
+
 
     @Override
     public ForgotPasswordResponse forgotPasswordUser(ForgotPasswordRequest request) {
@@ -72,7 +84,7 @@ public class AuthServiceImpl implements AuthService {
 
             CompletableFuture<Boolean> sendOtpFuture =
                     otpService.sendOTPByEmailRegister(signUpRequest.getEmail(),
-                             otpRegister.getOtp());
+                            otpRegister.getOtp());
             boolean otpSent = sendOtpFuture.get();
             if (otpSent) {
                 return SignUpResponse.builder()
@@ -87,6 +99,43 @@ public class AuthServiceImpl implements AuthService {
         } catch (Exception e) {
             throw new ExceptionHandling("Failed Create User");
         }
+    }
+
+    @Override
+    public ResponseEditPassword editPassUser(RequestEditUser requestEditUser) {
+        try {
+
+            Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+            Object principal = authentication.getPrincipal();
+
+            if (principal instanceof UserDetailsImpl) {
+                Optional<User> userOptional = userRepository
+                        .findByEmailAddress(((UserDetailsImpl) principal).getUsername());
+                if (userOptional.isEmpty()) {
+                    throw new UnauthorizedHandling("User Not Found");
+                }
+                User user = userOptional.get();
+                String newPassword = passwordEncoder.encode(requestEditUser.getNewPassword());
+                if (!passwordEncoder.matches(requestEditUser.getOldPassword(), user.getPassword())) {
+                    throw new UnauthorizedHandling("Failed Change Password, Wrong Old Password");
+                }
+                user.setPassword(newPassword);
+                user.setLastModified(Utils.getCurrentDateTimeAsDate());
+                userRepository.save(user);
+            } else if (principal instanceof String) {
+                throw new UnauthorizedHandling("User not authenticated");
+            }
+
+        } catch (Exception e) {
+            log.error(e.getCause() + " " + e.getMessage());
+            throw new ExceptionHandling(e.getMessage());
+        }
+
+
+        return ResponseEditPassword.builder()
+                .status(true)
+                .message("Success Update User Password")
+                .build();
     }
 
 }
