@@ -283,8 +283,8 @@ public class OTPServiceImpl implements OTPService {
 
 
             } catch (AuthenticationException e) {
-                log.error("Gagal melakukan otentikasi: " + e.getMessage());
-                throw new UnauthorizedHandling("Gagal melakukan otentikasi " + e.getMessage());
+                log.error("Failed to authenticate: " + e.getMessage());
+                throw new UnauthorizedHandling("Failed to authenticate " + e.getMessage());
             }
 
         } else {
