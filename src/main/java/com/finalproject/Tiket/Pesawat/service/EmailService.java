@@ -8,7 +8,7 @@ public interface EmailService {
     CompletableFuture<Void> sendEmail(EmailDetails emailDetails);
     String getForgotPasswordEmailTemplate(String name, String otp);
 
-    String getWelcomingMessageEmailTemplate(String name);
+    String getWelcomingMessageEmailTemplate();
 
     String getRegisterOtpEmailTemplate(String email, String otp);
 

@@ -64,12 +64,12 @@ public class EmailServiceImpl implements EmailService {
     }
 
     @Override
-    public String getWelcomingMessageEmailTemplate(String fullName) {
+    public String getWelcomingMessageEmailTemplate() {
         String emailTemplate = "<div style=\"font-family: Helvetica, Arial, sans-serif; min-width:1000px; overflow:auto; line-height:2;\">"
                 + "<div style=\"margin:50px auto; width:70%; padding:20px 0;\">"
                 + "<p><img alt=\"\" src=\"https://ckeditor.com/apps/ckfinder/userfiles/files/Vector.png\" style=\"width:150px;\" /></p>"
                 + "<h1 style=\"color: #00466a;\">AeroSwift</h1>"
-                + "<p style=\"line-height: 1.6; margin-bottom: 15px;\">Hello " + fullName + ",</p>"
+                + "<p style=\"line-height: 1.6; margin-bottom: 15px;\">Hello ,</p>"
                 + "<p style=\"line-height: 1.6; margin-bottom: 15px;\">Welcome to AeroSwift! Thank you for choosing us. Your registration was successful.</p>"
                 + "<p style=\"line-height: 1.6; margin-bottom: 15px;\">If you have any questions or need assistance, feel free to reach out to our support team.</p>"
                 + "<p style=\"line-height: 1.6; margin-bottom: 15px;\">Regards,<br />AeroSwift</p>"

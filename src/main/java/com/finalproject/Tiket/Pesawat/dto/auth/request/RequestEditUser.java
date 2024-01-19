@@ -2,6 +2,7 @@ package com.finalproject.Tiket.Pesawat.dto.auth.request;
 
 import com.finalproject.Tiket.Pesawat.dto.validation.ValidPassword;
 import com.finalproject.Tiket.Pesawat.dto.validation.ValidRetypePassword;
+import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -14,8 +15,8 @@ import org.checkerframework.checker.units.qual.A;
 @Builder
 @ValidRetypePassword
 public class RequestEditUser {
-    @ValidPassword
+    @Size(min = 8, message = "Password length min 8 character")
     private String newPassword;
-    @ValidPassword
+    @Size(min = 8, message = "Password length min 8 character")
     private String retypePassword;
 }

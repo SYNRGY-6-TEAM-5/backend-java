@@ -5,6 +5,7 @@ import com.finalproject.Tiket.Pesawat.dto.user.request.UpdateProfileRequest;
 import com.finalproject.Tiket.Pesawat.dto.user.response.UpdateProfileResponse;
 import com.finalproject.Tiket.Pesawat.dto.user.response.UploadFileResponse;
 import com.finalproject.Tiket.Pesawat.service.UserService;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
@@ -37,7 +38,7 @@ public class UserController {
     }
 
     @PutMapping("/profile")
-    public UpdateProfileResponse updateProfileResponse(@RequestBody UpdateProfileRequest updateProfileRequest) {
+    public UpdateProfileResponse updateProfileResponse(@Valid @RequestBody UpdateProfileRequest updateProfileRequest) {
         return userService.editProfile(updateProfileRequest);
     }
 
