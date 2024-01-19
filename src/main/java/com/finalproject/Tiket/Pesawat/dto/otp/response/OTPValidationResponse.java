@@ -12,4 +12,5 @@ import lombok.NoArgsConstructor;
 public class OTPValidationResponse {
     private Boolean status;
     private String message;
+    private String token;
 }
