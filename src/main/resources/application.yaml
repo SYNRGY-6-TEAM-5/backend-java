@@ -1,17 +1,17 @@
 # DB ONLINE
-spring:
-  datasource:
-    url: jdbc:postgresql://db.xtpzfhfmldlmexwlchhl.supabase.co:5432/postgres
-    username: postgres
-    password: pAy*&2Ep%L98ZKq
-    driverClassName: org.postgresql.Driver
-# DB offline
 #spring:
 #  datasource:
-#    url: jdbc:postgresql://localhost:5432/e_flight
+#    url: jdbc:postgresql://db.xtpzfhfmldlmexwlchhl.supabase.co:5432/postgres
 #    username: postgres
-#    password: Bangsat@123
+#    password: pAy*&2Ep%L98ZKq
 #    driverClassName: org.postgresql.Driver
+# DB offline
+spring:
+  datasource:
+    url: jdbc:postgresql://localhost:5432/e_flight
+    username: postgres
+    password: Bangsat@123
+    driverClassName: org.postgresql.Driver
   flyway:
     enabled: true
     repair: true
@@ -26,6 +26,7 @@ spring:
     port: 587
     username: swiftaero290@gmail.com
     password: bckqfapgzhgbdxfs
+
 
     properties:
       mail:
@@ -64,5 +65,9 @@ aeroswift:
   openapi:
     dev-url: https://backend-java-production-ece2.up.railway.app
 #    dev-url: http://localhost:8080
+server:
+  error:
+    include-binding-errors: always
+    include-message: always
 
 
