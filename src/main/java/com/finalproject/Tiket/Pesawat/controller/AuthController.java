@@ -69,7 +69,6 @@ public class AuthController {
     }
 
 
-
     // sign up user
     @PostMapping("/signup")
     public ResponseEntity<SignUpResponse> signUp(@Valid @RequestBody SignUpRequest signUpRequest) {
@@ -82,7 +81,7 @@ public class AuthController {
 
     @PostMapping("/signup/validate-otp")
     public ResponseEntity<Object> signUpvalidateOTP(
-            @RequestBody OTPValidationRequest validationRequest
+            @Valid @RequestBody OTPValidationRequest validationRequest
     ) {
         ValidSignUpResponse response = otpService.validateOTPRegister(validationRequest);
         return ResponseEntity.ok(response);
@@ -90,7 +89,7 @@ public class AuthController {
 
     @PostMapping("/forgot-password")
     public ResponseEntity<Object> generateOTP(
-            @RequestBody ForgotPasswordRequest request
+            @Valid @RequestBody ForgotPasswordRequest request
     ) {
         ForgotPasswordResponse response = authService.forgotPasswordUser(request);
         return ResponseEntity.ok(response);
@@ -98,7 +97,7 @@ public class AuthController {
 
     @PostMapping("/forgot-password/validate-otp")
     public ResponseEntity<Object> forgotPasswordValidateOTP(
-            @RequestBody OTPValidationRequest validationRequest
+            @Valid @RequestBody OTPValidationRequest validationRequest
     ) {
         OTPValidationResponse response = otpService.validateOTPForgotPassword(validationRequest);
         return ResponseEntity.ok(response);
@@ -111,7 +110,6 @@ public class AuthController {
         ResponseEditPassword response = authService.editPassUser(requestEditUser);
         return ResponseEntity.ok(response);
     }
-
 
 
     // OAUTH2

@@ -27,9 +27,6 @@ public class OtpRegister {
     @Column(name = "password")
     private String password;
 
-    @Column(name = "fullname")
-    private String fullName;
-
     @Column(name = "otp_code")
     private String otp;
 

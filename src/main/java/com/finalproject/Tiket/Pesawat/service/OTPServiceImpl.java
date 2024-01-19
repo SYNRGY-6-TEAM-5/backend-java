@@ -4,6 +4,7 @@ import com.finalproject.Tiket.Pesawat.dto.auth.response.ValidSignUpResponse;
 import com.finalproject.Tiket.Pesawat.dto.email.EmailDetails;
 import com.finalproject.Tiket.Pesawat.dto.otp.OTPValidationRequest;
 import com.finalproject.Tiket.Pesawat.dto.otp.response.OTPValidationResponse;
+import com.finalproject.Tiket.Pesawat.exception.EmailAlreadyRegisteredHandling;
 import com.finalproject.Tiket.Pesawat.exception.ExceptionHandling;
 import com.finalproject.Tiket.Pesawat.exception.UnauthorizedHandling;
 import com.finalproject.Tiket.Pesawat.model.*;
@@ -19,6 +20,7 @@ import org.springframework.scheduling.annotation.Async;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -170,7 +172,6 @@ public class OTPServiceImpl implements OTPService {
         OtpRegister otpRegister = OtpRegister.builder()
                 .emailUser(email)
                 .otp(otp)
-//                .fullName(fullName)
                 .password(encryptedPassword)
                 .generateDate(getCurrentDateTimeAsDate())
                 .expirationDate(new Date(System.currentTimeMillis() + OTP_EXPIRATION_DURATION))
@@ -207,6 +208,12 @@ public class OTPServiceImpl implements OTPService {
             throw new ExceptionHandling("OTP Not Found " + validationRequest.getEmail());
         }
 
+        Optional<User> userOptional = userRepository.findByEmailAddress(validationRequest.getEmail());
+        if (userOptional.isPresent()) {
+            throw new EmailAlreadyRegisteredHandling();
+        }
+
+
         OtpRegister otpRegister = otpInfoOptional.get();
 
         if (otpRegister.getExpirationDate() != null && otpRegister.getExpirationDate().before(new Date())) {
@@ -218,45 +225,68 @@ public class OTPServiceImpl implements OTPService {
         if (otpRegister.getEmailUser().equals(validationRequest.getEmail())
                 && otpRegister.getOtp().equals(validationRequest.getOtp())) {
 
+            // checking is password match from validation otp
+            if (!passwordEncoder.matches(validationRequest.getPassword(), otpRegister.getPassword())) {
+                throw new UnauthorizedHandling("Invalid Password: Please provide the " +
+                        "correct password used during registration.");
+            }
+
             Role userRole = roleRepository.findByRoleName(EnumRole.USER).orElseGet(() -> {
                 Role newRole = new Role();
                 newRole.setRoleName(EnumRole.USER);
                 return roleRepository.save(newRole);
             });
 
-            // SAVE USER HERE INTO DB
-            User newUser = User.builder()
-                    .fullname(otpRegister.getFullName())
-                    .emailAddress(otpRegister.getEmailUser())
-                    .password(otpRegister.getPassword())
-                    .isActive(true)
-                    .role(userRole)
-                    .createdAt(Utils.getCurrentDateTimeAsDate()).build();
+            try {
 
-            userRepository.save(newUser);
+                // SAVE USER HERE INTO DB
+                User newUser = User.builder()
+                        .emailAddress(otpRegister.getEmailUser())
+                        .password(otpRegister.getPassword())
+                        .isActive(true)
+                        .role(userRole)
+                        .createdAt(Utils.getCurrentDateTimeAsDate()).build();
 
-            String subject = "Welcome User";
-            String msgBody = emailService.getWelcomingMessageEmailTemplate(
-                    otpRegister.getFullName()
-            );
+                userRepository.save(newUser);
 
-            EmailDetails emailDetails = EmailDetails.builder()
-                    .subject(subject)
-                    .msgBody(msgBody)
-                    .recipient(otpRegister.getEmailUser())
-                    .build();
+                Authentication authentication = authenticationManager.authenticate(
+                        new UsernamePasswordAuthenticationToken(validationRequest.getEmail(),
+                                validationRequest.getPassword()));
 
-            CompletableFuture<Void> emailSendingFuture = emailService.sendEmail(emailDetails);
-            emailSendingFuture.thenApplyAsync(result -> true).exceptionally(ex -> {
-                ex.printStackTrace();
-                return false;
-            });
+                SecurityContextHolder.getContext().setAuthentication(authentication);
+                String jwt = jwtUtils.generateToken(authentication);
 
-            otpRegisterRepository.delete(otpRegister);
-            return ValidSignUpResponse.builder()
-                    .success(true)
-                    .message("Success create user")
-                    .build();
+                otpRegisterRepository.delete(otpRegister);
+
+
+                String subject = "Welcome User";
+                String msgBody = emailService.getWelcomingMessageEmailTemplate(
+                );
+
+                EmailDetails emailDetails = EmailDetails.builder()
+                        .subject(subject)
+                        .msgBody(msgBody)
+                        .recipient(otpRegister.getEmailUser())
+                        .build();
+
+                CompletableFuture<Void> emailSendingFuture = emailService.sendEmail(emailDetails);
+                emailSendingFuture.thenApplyAsync(result -> true).exceptionally(ex -> {
+                    ex.printStackTrace();
+                    return false;
+                });
+
+                return ValidSignUpResponse.builder()
+                        .success(true)
+                        .token(jwt)
+                        .message("Success create user")
+                        .build();
+
+
+            } catch (AuthenticationException e) {
+                log.error("Failed to authenticate: " + e.getMessage());
+                throw new UnauthorizedHandling("Failed to authenticate " + e.getMessage());
+            }
+
         } else {
             // Wrong OTP
             throw new UnauthorizedHandling("Wrong OTP");

@@ -3,6 +3,7 @@ package com.finalproject.Tiket.Pesawat.dto.auth.request;
 import com.finalproject.Tiket.Pesawat.dto.validation.ValidPassword;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -18,6 +19,6 @@ public class SignUpRequest {
 
     @NotEmpty(message = "Password is required.")
     @NotBlank(message = "Password cannot be blank.")
-    @ValidPassword
+    @Size(min = 8, message = "Password length min 8 character")
     private String password;
 }

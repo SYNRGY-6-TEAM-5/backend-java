@@ -12,4 +12,5 @@ import lombok.NoArgsConstructor;
 public class ValidSignUpResponse {
     private Boolean success;
     private String message;
+    private String token;
 }
