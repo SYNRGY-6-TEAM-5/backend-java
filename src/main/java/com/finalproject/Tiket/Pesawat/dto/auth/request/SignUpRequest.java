@@ -1,5 +1,6 @@
 package com.finalproject.Tiket.Pesawat.dto.auth.request;
 
+import com.finalproject.Tiket.Pesawat.dto.validation.ValidPassword;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.Size;
@@ -18,6 +19,6 @@ public class SignUpRequest {
 
     @NotEmpty(message = "Password is required.")
     @NotBlank(message = "Password cannot be blank.")
-    @Size(min = 6,message = "Password minimum 6 character")
+    @ValidPassword
     private String password;
 }
