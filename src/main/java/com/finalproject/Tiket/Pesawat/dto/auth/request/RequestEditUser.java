@@ -15,8 +15,6 @@ import org.checkerframework.checker.units.qual.A;
 @ValidRetypePassword
 public class RequestEditUser {
     @ValidPassword
-    private String oldPassword;
-    @ValidPassword
     private String newPassword;
     @ValidPassword
     private String retypePassword;

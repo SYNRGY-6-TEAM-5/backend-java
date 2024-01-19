@@ -11,10 +11,15 @@ import com.finalproject.Tiket.Pesawat.repository.OtpForgotPasswordRepository;
 import com.finalproject.Tiket.Pesawat.repository.OtpRegisterRepository;
 import com.finalproject.Tiket.Pesawat.repository.RoleRepository;
 import com.finalproject.Tiket.Pesawat.repository.UserRepository;
+import com.finalproject.Tiket.Pesawat.security.jwt.JwtUtils;
 import com.finalproject.Tiket.Pesawat.utils.Utils;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Async;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -46,6 +51,13 @@ public class OTPServiceImpl implements OTPService {
     @Autowired
     private UserRepository userRepository;
 
+    @Autowired
+    private AuthenticationManager authenticationManager;
+
+    @Autowired
+    private JwtUtils jwtUtils;
+
+
     private static final long OTP_EXPIRATION_DURATION = 5 * 60 * 1000; // 5 minutes
 
     @Override
@@ -55,7 +67,7 @@ public class OTPServiceImpl implements OTPService {
         String otp = String.valueOf(otpValue);
 
         Optional<OtpForgotPassword> otpInfoOptional = otpForgotPasswordRepository.findByEmailUser(email);
-        if (otpInfoOptional.isPresent()){
+        if (otpInfoOptional.isPresent()) {
             throw new UnauthorizedHandling("An OTP has already been sent to your email. " +
                     "Please check your inbox before requesting a new one.");
         }
@@ -90,7 +102,6 @@ public class OTPServiceImpl implements OTPService {
     }
 
 
-    @Override
     public OTPValidationResponse validateOTPForgotPassword(OTPValidationRequest validationRequest) {
         Optional<OtpForgotPassword> otpInfoOptional = otpForgotPasswordRepository.findByEmailUser(validationRequest.getEmail());
         OTPValidationResponse response = new OTPValidationResponse();
@@ -112,7 +123,7 @@ public class OTPServiceImpl implements OTPService {
             otpForgotPasswordRepository.delete(otpForgotPassword);
 
             Optional<User> newUserPw = userRepository.findByEmailAddress(validationRequest.getEmail());
-            if (newUserPw.isEmpty()){
+            if (newUserPw.isEmpty()) {
                 throw new ExceptionHandling("Email Not Registered");
             }
             User user = newUserPw.get();
@@ -122,24 +133,21 @@ public class OTPServiceImpl implements OTPService {
                 user.setPassword(passwordEncoder.encode(newPassword));
                 userRepository.save(user);
 
-                String subject = "Your New Password"; // todo msg utils
-                String msgBody = emailService.getForgotSendPassword(
-                        user.getEmailAddress(), newPassword);
+                Authentication authentication = authenticationManager.authenticate(
+                        new UsernamePasswordAuthenticationToken(user.getEmailAddress(), newPassword));
 
-                EmailDetails emailDetails = EmailDetails.builder()
-                        .subject(subject)
-                        .recipient(user.getEmailAddress())
-                        .msgBody(msgBody)
-                        .build();
+                SecurityContextHolder.getContext().setAuthentication(authentication);
+                String jwt = jwtUtils.generateToken(authentication);
 
-                return emailService.sendEmail(emailDetails);
-            }).thenApplyAsync(result -> {
+                return jwt;
+            }).thenApplyAsync(jwt -> {
                 response.setStatus(true);
-                response.setMessage("Success Validate OTP and Your New Password Was Sent to Email");
+                response.setMessage("Success Validate OTP");
+                response.setToken(jwt);
                 return response;
             }).exceptionally(ex -> {
                 ex.printStackTrace();
-                throw new UnauthorizedHandling("Failed to send email");
+                throw new UnauthorizedHandling("An Error Occured " + ex.getMessage());
             }).join();
         } else {
             throw new UnauthorizedHandling("Wrong OTP");
@@ -149,7 +157,7 @@ public class OTPServiceImpl implements OTPService {
     @Override
     public OtpRegister generateOTPRegister(String email, String password) {
         Optional<OtpRegister> otpInfoOptional = otpRegisterRepository.findByEmailUser(email);
-        if (otpInfoOptional.isPresent()){
+        if (otpInfoOptional.isPresent()) {
             throw new UnauthorizedHandling("An OTP has already been sent to your email. " +
                     "Please check your inbox before requesting a new one.");
         }
