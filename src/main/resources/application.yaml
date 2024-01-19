@@ -1,17 +1,17 @@
 # DB ONLINE
-spring:
-  datasource:
-    url: jdbc:postgresql://db.xtpzfhfmldlmexwlchhl.supabase.co:5432/postgres
-    username: postgres
-    password: pAy*&2Ep%L98ZKq
-    driverClassName: org.postgresql.Driver
-# DB offline
 #spring:
 #  datasource:
-#    url: jdbc:postgresql://localhost:5432/e_flight
+#    url: jdbc:postgresql://db.xtpzfhfmldlmexwlchhl.supabase.co:5432/postgres
 #    username: postgres
-#    password: Bangsat@123
+#    password: pAy*&2Ep%L98ZKq
 #    driverClassName: org.postgresql.Driver
+# DB offline
+#spring:
+  datasource:
+    url: jdbc:postgresql://localhost:5432/e_flight
+    username: postgres
+    password: Bangsat@123
+    driverClassName: org.postgresql.Driver
   flyway:
     enabled: true
     repair: true
