@@ -116,9 +116,9 @@ public class AuthServiceImpl implements AuthService {
                 }
                 User user = userOptional.get();
                 String newPassword = passwordEncoder.encode(requestEditUser.getNewPassword());
-                if (!passwordEncoder.matches(requestEditUser.getOldPassword(), user.getPassword())) {
-                    throw new UnauthorizedHandling("Failed Change Password, Wrong Old Password");
-                }
+//                if (!passwordEncoder.matches(requestEditUser.getOldPassword(), user.getPassword())) {
+//                    throw new UnauthorizedHandling("Failed Change Password, Wrong Old Password");
+//                }
                 user.setPassword(newPassword);
                 user.setLastModified(Utils.getCurrentDateTimeAsDate());
                 userRepository.save(user);
