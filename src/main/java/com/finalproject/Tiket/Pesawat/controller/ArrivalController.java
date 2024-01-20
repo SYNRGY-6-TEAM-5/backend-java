@@ -1,6 +1,7 @@
 package com.finalproject.Tiket.Pesawat.controller;
 
 import com.finalproject.Tiket.Pesawat.dto.arrival.response.ResponseListArrival;
+import com.finalproject.Tiket.Pesawat.service.ArrivalService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
