@@ -1,6 +1,5 @@
 package com.finalproject.Tiket.Pesawat.service;
 
-import com.finalproject.Tiket.Pesawat.controller.ArrivalService;
 import com.finalproject.Tiket.Pesawat.dto.arrival.response.ResponseListArrival;
 import com.finalproject.Tiket.Pesawat.exception.ExceptionHandling;
 import com.finalproject.Tiket.Pesawat.model.Arrival;
