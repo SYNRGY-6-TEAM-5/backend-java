@@ -31,5 +31,13 @@ class GlobalExceptionHandler {
         return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
     }
 
+    @ExceptionHandler(InternalServerHandling.class)
+    public ResponseEntity<?> handleInternalServerError(InternalServerHandling ex) {
+        ErrorDTO response = new ErrorDTO();
+        response.setMessage(ex.getMessage());
+        return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+
+
 }
 
