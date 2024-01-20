@@ -1,7 +1,7 @@
 package com.finalproject.Tiket.Pesawat.controller;
 
-import com.finalproject.Tiket.Pesawat.dto.airport.response.ResponseListAirport;
 import com.finalproject.Tiket.Pesawat.dto.airport.response.ResponseAirportDepartureArrivals;
+import com.finalproject.Tiket.Pesawat.dto.airport.response.ResponseListAirport;
 import com.finalproject.Tiket.Pesawat.service.AirportService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -31,4 +31,6 @@ public class AirportController {
         ResponseAirportDepartureArrivals response = airportService.getDepartureAndArrivalBaseAiportId(id);
         return ResponseEntity.ok(response);
     }
+
+    // search Airport based on name
 }
