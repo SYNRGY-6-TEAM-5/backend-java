@@ -108,6 +108,8 @@ public class AuthServiceImpl implements AuthService {
             Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
             Object principal = authentication.getPrincipal();
 
+
+
             if (principal instanceof UserDetailsImpl) {
                 Optional<User> userOptional = userRepository
                         .findByEmailAddress(((UserDetailsImpl) principal).getUsername());
@@ -115,10 +117,13 @@ public class AuthServiceImpl implements AuthService {
                     throw new UnauthorizedHandling("User Not Found");
                 }
                 User user = userOptional.get();
+
+                if (!requestEditUser.getNewPassword().equals(requestEditUser.getRetypePassword())) {
+                    throw new UnauthorizedHandling("New Password and Retype Password do not match");
+                }
+
                 String newPassword = passwordEncoder.encode(requestEditUser.getNewPassword());
-//                if (!passwordEncoder.matches(requestEditUser.getOldPassword(), user.getPassword())) {
-//                    throw new UnauthorizedHandling("Failed Change Password, Wrong Old Password");
-//                }
+
                 user.setPassword(newPassword);
                 user.setLastModified(Utils.getCurrentDateTimeAsDate());
                 userRepository.save(user);
