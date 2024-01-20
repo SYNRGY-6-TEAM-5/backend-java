@@ -1,6 +1,5 @@
 package com.finalproject.Tiket.Pesawat.dto.auth.request;
 
-import com.finalproject.Tiket.Pesawat.dto.validation.ValidPassword;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.Size;
