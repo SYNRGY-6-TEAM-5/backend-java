@@ -51,7 +51,7 @@ public class User {
     @JoinColumn(name = "image_id")
     private Images images;
 
-    @Column
+    @Column(name = "created_at")
     @Timestamp
     @Temporal(TemporalType.TIMESTAMP)
     private Date createdAt;
