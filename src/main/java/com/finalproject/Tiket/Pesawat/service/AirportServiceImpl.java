@@ -6,6 +6,7 @@ import com.finalproject.Tiket.Pesawat.exception.ExceptionHandling;
 import com.finalproject.Tiket.Pesawat.exception.InternalServerHandling;
 import com.finalproject.Tiket.Pesawat.model.Airport;
 import com.finalproject.Tiket.Pesawat.repository.AirportRepository;
+import com.finalproject.Tiket.Pesawat.specification.AirportSpecification;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -20,9 +21,9 @@ public class AirportServiceImpl implements AirportService {
     private AirportRepository airportRepository;
 
     @Override
-    public ResponseListAirport getListOfAirport() {
+    public ResponseListAirport getListOfAirport(String search) {
         try {
-            List<Airport> airportList = airportRepository.findAll();
+            List<Airport> airportList = airportRepository.findAll(new AirportSpecification(search));
 
             if (airportList.isEmpty()) {
                 throw new ExceptionHandling("Airport Empty");
