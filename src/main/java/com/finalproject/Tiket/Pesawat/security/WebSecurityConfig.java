@@ -62,9 +62,9 @@ public class WebSecurityConfig {
                         auth
                                 .requestMatchers("/login/**", "/error/**",
                                         "swagger-ui/**", "/swagger-resources/**", "/swagger-resources",
-                                        "/webjars/**", "/v3/api-docs/**", "/configuration/ui"
+                                        "/webjars/**", "/v3/api-docs/**", "/configuration/ui","api/v1/auth/**"
+                                        ,"api/v1/airport/**","api/v1/arrival/**","api/v1/departure/**"
                                 ).permitAll()
-                                .requestMatchers("/api/v1/auth/**").permitAll()
                                 .anyRequest()
                                 .authenticated())
                 .httpBasic(basic -> basic.authenticationEntryPoint(unauthorizedHandler))

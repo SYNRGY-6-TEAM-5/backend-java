@@ -1,11 +1,17 @@
 package com.finalproject.Tiket.Pesawat.model;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import jdk.jfr.Timestamp;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.BatchSize;
+import org.hibernate.annotations.Fetch;
+import org.hibernate.annotations.FetchMode;
+import org.springframework.data.jpa.repository.QueryHints;
 
 import java.util.Date;
 
@@ -21,10 +27,6 @@ public class Arrival {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "arrival_id")
     private Integer id;
-
-    @ManyToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name = "airport_id")
-    private Airport airport;
 
     @Column
     private String terminal;
@@ -43,4 +45,13 @@ public class Arrival {
     @Timestamp
     @Temporal(TemporalType.TIMESTAMP)
     private Date updatedAt;
+
+
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JsonManagedReference
+    @JoinColumn(name = "airport_id")
+    @Fetch(FetchMode.SELECT)
+    private Airport airport;
+
+
 }

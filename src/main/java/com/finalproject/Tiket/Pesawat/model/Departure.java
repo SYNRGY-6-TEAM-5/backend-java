@@ -1,5 +1,7 @@
 package com.finalproject.Tiket.Pesawat.model;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import jdk.jfr.Timestamp;
 import lombok.AllArgsConstructor;
@@ -22,9 +24,6 @@ public class Departure {
     @Column(name = "departure_id")
     private Integer id;
 
-    @ManyToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name = "airport_id")
-    private Airport airport;
 
     @Column
     private String terminal;
@@ -43,4 +42,9 @@ public class Departure {
     @Timestamp
     @Temporal(TemporalType.TIMESTAMP)
     private Date updatedAt;
+
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JsonManagedReference
+    @JoinColumn(name = "airport_id")
+    private Airport airport;
 }
