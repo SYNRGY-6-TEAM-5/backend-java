@@ -25,7 +25,7 @@ class GlobalExceptionHandler {
     }
 
     @ExceptionHandler(EmailAlreadyRegisteredHandling.class)
-    public ResponseEntity<?> emailAlreadyRegistered(EmailAlreadyRegisteredHandling ex) {
+    public ResponseEntity<?> emailAlreadyRegistered() {
         ErrorDTO response = new ErrorDTO();
         response.setMessage("Email Already Registered");
         return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
