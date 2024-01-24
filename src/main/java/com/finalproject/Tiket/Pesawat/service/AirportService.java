@@ -5,7 +5,7 @@ import com.finalproject.Tiket.Pesawat.dto.airport.response.ResponseListAirport;
 
 public interface AirportService  {
 
-    ResponseListAirport getListOfAirport();
+    ResponseListAirport getListOfAirport(String search);
 
     ResponseAirportDepartureArrivals getDepartureAndArrivalBaseAiportId(Integer id);
 }

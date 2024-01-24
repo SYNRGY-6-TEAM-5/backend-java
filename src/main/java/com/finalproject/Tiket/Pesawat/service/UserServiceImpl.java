@@ -4,6 +4,7 @@ import com.cloudinary.utils.StringUtils;
 import com.finalproject.Tiket.Pesawat.dto.user.request.UpdateProfileRequest;
 import com.finalproject.Tiket.Pesawat.dto.user.response.UpdateProfileResponse;
 import com.finalproject.Tiket.Pesawat.dto.user.response.UploadFileResponse;
+import com.finalproject.Tiket.Pesawat.dto.user.response.UserDetailsResponse;
 import com.finalproject.Tiket.Pesawat.exception.EmailAlreadyRegisteredHandling;
 import com.finalproject.Tiket.Pesawat.exception.ExceptionHandling;
 import com.finalproject.Tiket.Pesawat.exception.UnauthorizedHandling;
@@ -132,11 +133,12 @@ public class UserServiceImpl implements UserService {
 
         throw new UnauthorizedHandling("Unknown principal type");
     }
+
     @Override
     public Boolean saveNewUserFromOauth2(User user, String imageUrl) {
         try {
             Optional<User> userOptional = userRepository.findByEmailAddress(user.getEmailAddress());
-            if (userOptional.isPresent()){
+            if (userOptional.isPresent()) {
                 throw new EmailAlreadyRegisteredHandling();
             }
 //            Optional<Role> optionalUserRole = roleRepository.findByRoleName(EnumRole.USER);
@@ -160,7 +162,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public UpdateProfileResponse editProfile(UpdateProfileRequest updateProfileRequest) {
-       // get signed
+        // get signed
         try {
             Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
             Object principal = authentication.getPrincipal();
@@ -191,6 +193,42 @@ public class UserServiceImpl implements UserService {
                 .success(true)
                 .message("success update profile")
                 .build();
+    }
+
+    @Override
+    public UserDetailsResponse getUserDetails() {
+        try {
+            Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+            Object principal = authentication.getPrincipal();
+
+            if (principal instanceof UserDetailsImpl) {
+                Optional<User> userOptional = userRepository
+                        .findByEmailAddress(((UserDetailsImpl) principal).getUsername());
+                if (userOptional.isEmpty()) {
+                    throw new UnauthorizedHandling("User Not Found");
+                }
+
+                User user = userOptional.get();
+                String imageUrl = (user.getImages() != null) ? user.getImages().getUrl() : null;
+
+                return UserDetailsResponse.builder()
+                        .success(true)
+                        .id(user.getUuid().toString())
+                        .imageUrl(imageUrl)
+                        .fullName(user.getFullname())
+                        .dob(user.getBirthDate())
+                        .roleName(user.getRole().getRoleName().name())
+                        .createdAt(user.getCreatedAt())
+                        .build();
+            } else if (principal instanceof String) {
+                throw new UnauthorizedHandling("User not authenticated");
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw new ExceptionHandling(e.getMessage());
+        }
+        throw new UnauthorizedHandling("Unknown principal type");
     }
 
 

@@ -52,7 +52,7 @@ public class AuthServiceImpl implements AuthService {
         // otp send
         OtpForgotPassword otp = otpService.generateOTPForgotPassword(request.getEmail());
         CompletableFuture<Boolean> sendOtpFuture = otpService.
-                sendOTPByEmailForgotPassword(request.getEmail(), user.getFullname(), otp.getOtp());
+                sendOTPByEmailForgotPassword(request.getEmail(), otp.getOtp());
         try {
 
             boolean otpSent = sendOtpFuture.get();
