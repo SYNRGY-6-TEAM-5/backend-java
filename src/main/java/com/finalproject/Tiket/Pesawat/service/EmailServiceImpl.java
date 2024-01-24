@@ -45,12 +45,12 @@ public class EmailServiceImpl implements EmailService {
     }
 
     @Override
-    public String getForgotPasswordEmailTemplate(String name, String otp) {
+    public String getForgotPasswordEmailTemplate(String otp) {
         String emailTemplate = "<div style=\"font-family: Helvetica, Arial, sans-serif; min-width:1000px; overflow:auto; line-height:2;\">"
                 + "<div style=\"margin:50px auto; width:70%; padding:20px 0;\">"
                 + "<p><img alt=\"\" src=\"https://ckeditor.com/apps/ckfinder/userfiles/files/Vector.png\" style=\"width:150px;\" /></p>"
                 + "<h1 style=\"color: #00466a;\">AeroSwift</h1>"
-                + "<p style=\"line-height: 1.6; margin-bottom: 15px;\">Hello " + name + ",</p>"
+                + "<p style=\"line-height: 1.6; margin-bottom: 15px;\">Hello User</p>"
                 + "<p style=\"line-height: 1.6; margin-bottom: 15px;\">Thank you for choosing AeroSwift. Use the following OTP to complete your Forgot Password Procedure. OTP is valid for 5 minutes:</p>"
                 + "<h2 style=\"background: #00466a; margin: 0 auto; width: max-content; padding: 10px; color: #fff; border-radius: 4px; text-align: center;\">" + otp + "</h2>"
                 + "<p style=\"line-height: 1.6; margin-bottom: 15px;\">Regards,<br />AeroSwift</p>"

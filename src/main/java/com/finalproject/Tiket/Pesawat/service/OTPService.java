@@ -11,7 +11,7 @@ import java.util.concurrent.CompletableFuture;
 public interface OTPService {
     OtpForgotPassword generateOTPForgotPassword(String email);
 
-    CompletableFuture<Boolean> sendOTPByEmailForgotPassword(String email, String name, String otp);
+    CompletableFuture<Boolean> sendOTPByEmailForgotPassword(String email, String otp);
 
     OTPValidationResponse validateOTPForgotPassword(OTPValidationRequest validationRequest);
 
