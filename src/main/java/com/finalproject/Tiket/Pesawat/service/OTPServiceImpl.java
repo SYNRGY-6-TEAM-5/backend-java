@@ -87,9 +87,9 @@ public class OTPServiceImpl implements OTPService {
 
     @Override
     @Async
-    public CompletableFuture<Boolean> sendOTPByEmailForgotPassword(String email, String name, String otp) {
+    public CompletableFuture<Boolean> sendOTPByEmailForgotPassword(String email, String otp) {
         String subject = "OTP Verification Forgot Password";
-        String msgBody = emailService.getForgotPasswordEmailTemplate(name, otp);
+        String msgBody = emailService.getForgotPasswordEmailTemplate(otp);
 
         EmailDetails emailDetails = new EmailDetails();
 
