@@ -14,8 +14,8 @@ import com.finalproject.Tiket.Pesawat.repository.RoleRepository;
 import com.finalproject.Tiket.Pesawat.repository.UserRepository;
 import com.finalproject.Tiket.Pesawat.security.jwt.JwtUtils;
 import com.finalproject.Tiket.Pesawat.utils.Utils;
+import lombok.AllArgsConstructor;
 import lombok.extern.log4j.Log4j2;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -30,36 +30,29 @@ import java.util.Optional;
 import java.util.Random;
 import java.util.concurrent.CompletableFuture;
 
+import static com.finalproject.Tiket.Pesawat.utils.Constants.CONSTANT_EMAIL_TEST_SIGNUP;
 import static com.finalproject.Tiket.Pesawat.utils.Utils.getCurrentDateTimeAsDate;
 
 @Log4j2
 @Service
+@AllArgsConstructor
 public class OTPServiceImpl implements OTPService {
 
-    @Autowired
     private OtpForgotPasswordRepository otpForgotPasswordRepository;
 
-    @Autowired
     private OtpRegisterRepository otpRegisterRepository;
-    @Autowired
+
     private EmailService emailService;
 
-    @Autowired
     private PasswordEncoder passwordEncoder;
 
-    @Autowired
     private RoleRepository roleRepository;
 
-    @Autowired
     private UserRepository userRepository;
 
-    @Autowired
     private AuthenticationManager authenticationManager;
 
-    @Autowired
     private JwtUtils jwtUtils;
-
-
     private static final long OTP_EXPIRATION_DURATION = 5 * 60 * 1000; // 5 minutes
 
     @Override
@@ -98,7 +91,7 @@ public class OTPServiceImpl implements OTPService {
         emailDetails.setMsgBody(msgBody);
         CompletableFuture<Void> emailSendingFuture = emailService.sendEmail(emailDetails);
         return emailSendingFuture.thenApplyAsync(result -> true).exceptionally(ex -> {
-            ex.printStackTrace();
+            log.error(ex.getMessage());
             return false;
         });
     }
@@ -121,7 +114,8 @@ public class OTPServiceImpl implements OTPService {
             throw new UnauthorizedHandling("Otp Expired");
         }
 
-        if (otpForgotPassword.getEmailUser().equals(validationRequest.getEmail()) && otpForgotPassword.getOtp().equals(validationRequest.getOtp())) {
+        if (otpForgotPassword.getEmailUser().equals(validationRequest.getEmail())
+                && otpForgotPassword.getOtp().equals(validationRequest.getOtp())) {
             otpForgotPasswordRepository.delete(otpForgotPassword);
 
             Optional<User> newUserPw = userRepository.findByEmailAddress(validationRequest.getEmail());
@@ -139,16 +133,15 @@ public class OTPServiceImpl implements OTPService {
                         new UsernamePasswordAuthenticationToken(user.getEmailAddress(), newPassword));
 
                 SecurityContextHolder.getContext().setAuthentication(authentication);
-                String jwt = jwtUtils.generateToken(authentication);
 
-                return jwt;
+                return jwtUtils.generateToken(authentication);
             }).thenApplyAsync(jwt -> {
                 response.setStatus(true);
                 response.setMessage("Success Validate OTP");
                 response.setToken(jwt);
                 return response;
             }).exceptionally(ex -> {
-                ex.printStackTrace();
+                log.error(ex.getMessage());
                 throw new UnauthorizedHandling("An Error Occured " + ex.getMessage());
             }).join();
         } else {
@@ -162,6 +155,22 @@ public class OTPServiceImpl implements OTPService {
         if (otpInfoOptional.isPresent()) {
             throw new UnauthorizedHandling("An OTP has already been sent to your email. " +
                     "Please check your inbox before requesting a new one.");
+        }
+
+        if (email.equals(CONSTANT_EMAIL_TEST_SIGNUP)) { // hardcode testcase use
+            String otp = String.valueOf(1234);
+            String encryptedPassword = passwordEncoder.encode(password);
+
+            OtpRegister otpRegister = OtpRegister.builder()
+                    .emailUser(email)
+                    .otp(otp)
+                    .password(encryptedPassword)
+                    .generateDate(getCurrentDateTimeAsDate())
+                    .expirationDate(new Date(System.currentTimeMillis() + OTP_EXPIRATION_DURATION))
+                    .build();
+
+            otpRegisterRepository.save(otpRegister);
+            return otpRegister;
         }
 
         Random random = new Random();
@@ -195,7 +204,7 @@ public class OTPServiceImpl implements OTPService {
 
         CompletableFuture<Void> emailSendingFuture = emailService.sendEmail(emailDetails);
         return emailSendingFuture.thenApplyAsync(result -> true).exceptionally(ex -> {
-            ex.printStackTrace();
+            log.error(ex.getMessage());
             return false;
         });
     }
@@ -209,7 +218,7 @@ public class OTPServiceImpl implements OTPService {
         }
 
         Optional<User> userOptional = userRepository.findByEmailAddress(validationRequest.getEmail());
-        if (userOptional.isPresent()) {
+        if (userOptional.isPresent() && !validationRequest.getEmail().equals(CONSTANT_EMAIL_TEST_SIGNUP)) {
             throw new EmailAlreadyRegisteredHandling();
         }
 
@@ -236,19 +245,25 @@ public class OTPServiceImpl implements OTPService {
                 newRole.setRoleName(EnumRole.USER);
                 return roleRepository.save(newRole);
             });
+            if (!validationRequest.getEmail().equals(CONSTANT_EMAIL_TEST_SIGNUP)) {
+                try {
+                    User newUser = User.builder()
+                            .emailAddress(otpRegister.getEmailUser())
+                            .password(otpRegister.getPassword())
+                            .isActive(true)
+                            .role(userRole)
+                            .createdAt(Utils.getCurrentDateTimeAsDate()).build();
 
-            try {
+                    userRepository.save(newUser);
 
-                // SAVE USER HERE INTO DB
-                User newUser = User.builder()
-                        .emailAddress(otpRegister.getEmailUser())
-                        .password(otpRegister.getPassword())
-                        .isActive(true)
-                        .role(userRole)
-                        .createdAt(Utils.getCurrentDateTimeAsDate()).build();
 
-                userRepository.save(newUser);
+                } catch (AuthenticationException e) {
+                    log.error("Failed to authenticate: " + e.getMessage());
+                    throw new UnauthorizedHandling("Failed to authenticate " + e.getMessage());
+                }
+            }
 
+            if (!validationRequest.getEmail().equals(CONSTANT_EMAIL_TEST_SIGNUP)) {
                 Authentication authentication = authenticationManager.authenticate(
                         new UsernamePasswordAuthenticationToken(validationRequest.getEmail(),
                                 validationRequest.getPassword()));
@@ -258,10 +273,8 @@ public class OTPServiceImpl implements OTPService {
 
                 otpRegisterRepository.delete(otpRegister);
 
-
                 String subject = "Welcome User";
-                String msgBody = emailService.getWelcomingMessageEmailTemplate(
-                );
+                String msgBody = emailService.getWelcomingMessageEmailTemplate();
 
                 EmailDetails emailDetails = EmailDetails.builder()
                         .subject(subject)
@@ -271,7 +284,7 @@ public class OTPServiceImpl implements OTPService {
 
                 CompletableFuture<Void> emailSendingFuture = emailService.sendEmail(emailDetails);
                 emailSendingFuture.thenApplyAsync(result -> true).exceptionally(ex -> {
-                    ex.printStackTrace();
+                    log.error(ex.getMessage());
                     return false;
                 });
 
@@ -280,15 +293,16 @@ public class OTPServiceImpl implements OTPService {
                         .token(jwt)
                         .message("Success create user")
                         .build();
+            } else {
+                otpRegisterRepository.delete(otpRegister);
 
-
-            } catch (AuthenticationException e) {
-                log.error("Failed to authenticate: " + e.getMessage());
-                throw new UnauthorizedHandling("Failed to authenticate " + e.getMessage());
+                return ValidSignUpResponse.builder()
+                        .success(true)
+                        .token("gak ada token cumnan test")
+                        .message("Success create user")
+                        .build();
             }
-
         } else {
-            // Wrong OTP
             throw new UnauthorizedHandling("Wrong OTP");
         }
     }

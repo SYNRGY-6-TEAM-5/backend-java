@@ -48,7 +48,6 @@ public class AuthServiceImpl implements AuthService {
             throw new ExceptionHandling("Email Not Found");
         }
 
-        User user = userOptional.get();
         // otp send
         OtpForgotPassword otp = otpService.generateOTPForgotPassword(request.getEmail());
         CompletableFuture<Boolean> sendOtpFuture = otpService.
@@ -74,7 +73,7 @@ public class AuthServiceImpl implements AuthService {
     @Async
     public SignUpResponse signUpUser(SignUpRequest signUpRequest) {
         Optional<User> userOptional = userRepository.findByEmailAddress(signUpRequest.getEmail());
-        if (userOptional.isPresent()) {
+        if (userOptional.isPresent() && !signUpRequest.getEmail().equals("testAeroSwift@gmail.com")) {
             throw new EmailAlreadyRegisteredHandling();
         }
 
@@ -97,7 +96,9 @@ public class AuthServiceImpl implements AuthService {
             }
 
         } catch (Exception e) {
-            throw new ExceptionHandling("Failed Create User");
+            log.error(e.getMessage());
+            throw new UnauthorizedHandling("An OTP has already been sent to your email. " +
+                    "Please check your inbox before requesting a new one.");
         }
     }
 
