@@ -1,6 +1,7 @@
 package com.finalproject.Tiket.Pesawat.service;
 
 import com.finalproject.Tiket.Pesawat.dto.user.request.UpdateProfileRequest;
+import com.finalproject.Tiket.Pesawat.dto.user.request.UploadImageRequest;
 import com.finalproject.Tiket.Pesawat.dto.user.response.UpdateProfileResponse;
 import com.finalproject.Tiket.Pesawat.dto.user.response.UploadFileResponse;
 import com.finalproject.Tiket.Pesawat.dto.user.response.UserDetailsResponse;
@@ -9,7 +10,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 public interface UserService {
 
-    UploadFileResponse uploadFile(String fileName, MultipartFile file);
+    UploadFileResponse uploadFile(UploadImageRequest uploadImageRequest);
     UploadFileResponse editFile(MultipartFile file);
 
     Boolean saveNewUserFromOauth2(User user, String imageUrl);
