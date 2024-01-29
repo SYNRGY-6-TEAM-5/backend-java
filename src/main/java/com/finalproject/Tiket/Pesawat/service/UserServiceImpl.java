@@ -1,7 +1,7 @@
 package com.finalproject.Tiket.Pesawat.service;
 
-import com.cloudinary.utils.StringUtils;
 import com.finalproject.Tiket.Pesawat.dto.user.request.UpdateProfileRequest;
+import com.finalproject.Tiket.Pesawat.dto.user.request.UploadImageRequest;
 import com.finalproject.Tiket.Pesawat.dto.user.response.UpdateProfileResponse;
 import com.finalproject.Tiket.Pesawat.dto.user.response.UploadFileResponse;
 import com.finalproject.Tiket.Pesawat.dto.user.response.UserDetailsResponse;
@@ -10,12 +10,13 @@ import com.finalproject.Tiket.Pesawat.exception.ExceptionHandling;
 import com.finalproject.Tiket.Pesawat.exception.UnauthorizedHandling;
 import com.finalproject.Tiket.Pesawat.model.Images;
 import com.finalproject.Tiket.Pesawat.model.User;
-import com.finalproject.Tiket.Pesawat.repository.RoleRepository;
 import com.finalproject.Tiket.Pesawat.repository.UserRepository;
 import com.finalproject.Tiket.Pesawat.security.service.UserDetailsImpl;
 import com.finalproject.Tiket.Pesawat.utils.Utils;
+import lombok.AllArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.MediaType;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
@@ -25,18 +26,15 @@ import java.util.Optional;
 
 @Service
 @Log4j2
+@AllArgsConstructor
 public class UserServiceImpl implements UserService {
-    @Autowired
+
     private CloudinaryService cloudinaryService;
 
-    @Autowired
     private UserRepository userRepository;
 
-    @Autowired
-    private RoleRepository roleRepository;
-
     @Override
-    public UploadFileResponse uploadFile(String fileName, MultipartFile file) {
+    public UploadFileResponse uploadFile(UploadImageRequest uploadImageRequest) {
         try {
             Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
             Object principal = authentication.getPrincipal();
@@ -50,15 +48,25 @@ public class UserServiceImpl implements UserService {
 
                 log.info("user a " + ((UserDetailsImpl) principal).getUsername());
                 User user = userOptional.get();
-                if (fileName.isEmpty()) {
-                    return null;
+
+                if (uploadImageRequest.getFile() == null) {
+                    throw new ExceptionHandling("File is not provided");
                 }
-                if (file.isEmpty()) {
-                    return null;
+
+                String contentType = uploadImageRequest.getFile().getContentType();
+
+                if (contentType == null) {
+                    throw new ExceptionHandling("Content type is not provided");
                 }
-                String url = cloudinaryService.uploadFile(file, "user-images");
+
+                if (!MediaType.IMAGE_JPEG.isCompatibleWith(MediaType.parseMediaType(contentType)) &&
+                        !MediaType.IMAGE_PNG.isCompatibleWith(MediaType.parseMediaType(contentType))) {
+                    throw new ExceptionHandling("File must be in JPG, JPEG, or PNG format");
+                }
+
+                String url = cloudinaryService.uploadFile(uploadImageRequest.getFile(), "user-images");
                 Images image = Images.builder()
-                        .name(fileName)
+                        .name(uploadImageRequest.getName())
                         .url(url)
                         .build();
 
@@ -77,7 +85,7 @@ public class UserServiceImpl implements UserService {
             }
 
         } catch (Exception e) {
-            e.printStackTrace();
+            log.error(e.getMessage());
             throw new ExceptionHandling(e.getMessage());
         }
         throw new UnauthorizedHandling("Unknown principal type");
@@ -97,8 +105,19 @@ public class UserServiceImpl implements UserService {
                 }
                 User user = userOptional.get();
 
-                if (user.getImages() == null || StringUtils.isEmpty(user.getImages().getUrl())) {
-                    throw new ExceptionHandling("User does not have a profile image");
+                if (file == null) {
+                    throw new ExceptionHandling("File is not provided");
+                }
+
+                String contentType = file.getContentType();
+
+                if (contentType == null) {
+                    throw new ExceptionHandling("Content type is not provided");
+                }
+
+                if (!MediaType.IMAGE_JPEG.isCompatibleWith(MediaType.parseMediaType(contentType)) &&
+                        !MediaType.IMAGE_PNG.isCompatibleWith(MediaType.parseMediaType(contentType))) {
+                    throw new ExceptionHandling("File must be in JPG, JPEG, or PNG format");
                 }
                 // Extract public_id from the Cloudinary URL
                 String publicId = Utils.extractPublicId(user.getImages().getUrl());
@@ -109,13 +128,7 @@ public class UserServiceImpl implements UserService {
                 if (url == null) {
                     throw new ExceptionHandling("Error editing file");
                 }
-//                Images image = Images.builder()
-//                        .name(user.getImages().getName())
-//                        .url(url)
-//                        .build();
-//
-//                user.setImages(image);
-//                userRepository.save(user);
+
 
                 return UploadFileResponse.builder()
                         .success(true)
@@ -126,8 +139,9 @@ public class UserServiceImpl implements UserService {
                 throw new UnauthorizedHandling("User not authenticated");
             }
 
+
         } catch (Exception e) {
-            e.printStackTrace();
+            log.error(e.getMessage());
             throw new ExceptionHandling(e.getMessage());
         }
 
@@ -186,7 +200,7 @@ public class UserServiceImpl implements UserService {
             }
 
         } catch (Exception e) {
-            e.printStackTrace();
+            log.error(e.getMessage());
             throw new ExceptionHandling(e.getMessage());
         }
         return UpdateProfileResponse.builder()
@@ -225,7 +239,7 @@ public class UserServiceImpl implements UserService {
             }
 
         } catch (Exception e) {
-            e.printStackTrace();
+            log.error(e.getMessage());
             throw new ExceptionHandling(e.getMessage());
         }
         throw new UnauthorizedHandling("Unknown principal type");
