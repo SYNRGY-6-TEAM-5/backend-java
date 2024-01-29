@@ -15,6 +15,7 @@ import com.finalproject.Tiket.Pesawat.model.User;
 import com.finalproject.Tiket.Pesawat.repository.UserRepository;
 import com.finalproject.Tiket.Pesawat.security.service.UserDetailsImpl;
 import com.finalproject.Tiket.Pesawat.utils.Utils;
+import lombok.AllArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Async;
@@ -26,25 +27,26 @@ import org.springframework.stereotype.Service;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 
+import static com.finalproject.Tiket.Pesawat.utils.Constants.CONSTANT_EMAIL_TEST_FORGOT;
+
 @Service
 @Log4j2
+@AllArgsConstructor
 public class AuthServiceImpl implements AuthService {
 
-    @Autowired
     private UserRepository userRepository;
 
-    @Autowired
     private OTPService otpService;
 
-    @Autowired
     private PasswordEncoder passwordEncoder;
 
 
     @Override
     public ForgotPasswordResponse forgotPasswordUser(ForgotPasswordRequest request) {
         ForgotPasswordResponse response = new ForgotPasswordResponse();
+        log.info(request.getEmail() +  " dann " + CONSTANT_EMAIL_TEST_FORGOT);
         Optional<User> userOptional = userRepository.findByEmailAddress(request.getEmail());
-        if (userOptional.isEmpty()) {
+        if (userOptional.isEmpty() && !request.getEmail().equals(CONSTANT_EMAIL_TEST_FORGOT)) {
             throw new ExceptionHandling("Email Not Found");
         }
 

@@ -30,6 +30,7 @@ import java.util.Optional;
 import java.util.Random;
 import java.util.concurrent.CompletableFuture;
 
+import static com.finalproject.Tiket.Pesawat.utils.Constants.CONSTANT_EMAIL_TEST_FORGOT;
 import static com.finalproject.Tiket.Pesawat.utils.Constants.CONSTANT_EMAIL_TEST_SIGNUP;
 import static com.finalproject.Tiket.Pesawat.utils.Utils.getCurrentDateTimeAsDate;
 
@@ -65,6 +66,16 @@ public class OTPServiceImpl implements OTPService {
         if (otpInfoOptional.isPresent()) {
             throw new UnauthorizedHandling("An OTP has already been sent to your email. " +
                     "Please check your inbox before requesting a new one.");
+        }
+
+        if (email.equals(CONSTANT_EMAIL_TEST_FORGOT)) {
+            OtpForgotPassword otpForgotPassword = new OtpForgotPassword();
+            otpForgotPassword.setEmailUser(email);
+            otpForgotPassword.setOtp("1234");
+            otpForgotPassword.setGenerateDate(getCurrentDateTimeAsDate());
+            otpForgotPassword.setExpirationDate(new Date(System.currentTimeMillis() + OTP_EXPIRATION_DURATION));
+            otpForgotPasswordRepository.save(otpForgotPassword);
+            return otpForgotPassword;
         }
 
         OtpForgotPassword otpForgotPassword = new OtpForgotPassword();
@@ -117,6 +128,14 @@ public class OTPServiceImpl implements OTPService {
         if (otpForgotPassword.getEmailUser().equals(validationRequest.getEmail())
                 && otpForgotPassword.getOtp().equals(validationRequest.getOtp())) {
             otpForgotPasswordRepository.delete(otpForgotPassword);
+
+            if (otpForgotPassword.getEmailUser().equals(CONSTANT_EMAIL_TEST_FORGOT)) {
+                return OTPValidationResponse.builder()
+                        .status(true)
+                        .message("Success Validate OTP")
+                        .token("gak ada token cuman dummy test")
+                        .build();
+            }
 
             Optional<User> newUserPw = userRepository.findByEmailAddress(validationRequest.getEmail());
             if (newUserPw.isEmpty()) {
