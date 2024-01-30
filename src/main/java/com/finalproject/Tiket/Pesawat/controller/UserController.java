@@ -6,28 +6,28 @@ import com.finalproject.Tiket.Pesawat.dto.user.request.UploadImageRequest;
 import com.finalproject.Tiket.Pesawat.dto.user.response.UpdateProfileResponse;
 import com.finalproject.Tiket.Pesawat.dto.user.response.UploadFileResponse;
 import com.finalproject.Tiket.Pesawat.dto.user.response.UserDetailsResponse;
+import com.finalproject.Tiket.Pesawat.model.Booking;
+import com.finalproject.Tiket.Pesawat.service.BookingService;
 import com.finalproject.Tiket.Pesawat.service.UserService;
 import jakarta.validation.Valid;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.AllArgsConstructor;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.util.List;
+
 @RestController
 @RequestMapping("/api/v1/user")
+@AllArgsConstructor
 //@PreAuthorize("hasRole('USER')")
 public class UserController {
-    /*
-    Controller untuk User -> {
-       Mengelola operasi yang berkaitan dengan role user,
-       Seperti CRUD (Create, Read, Update, Delete)
-    }
-     */
 
-    @Autowired
     private UserService userService;
+
+    private BookingService bookingService;
 
 
     @PostMapping(value = "/profile-image", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
@@ -49,6 +49,17 @@ public class UserController {
     public ResponseEntity<UserDetailsResponse> getUserDetails() {
         UserDetailsResponse userDetailsResponse = userService.getUserDetails();
         return ResponseEntity.ok(userDetailsResponse);
+    }
+
+//    @PostMapping("/booking")
+//    public ResponseEntity<Booking> userCreateBooking(@Valid @RequestBody UserRequestBooking userRequestBooking) {
+//
+//    }
+
+    @GetMapping("/booking") // todo seharusnya berdasarkan userid/passengerid -> yang sedang login
+    public ResponseEntity<List<Booking>> getBookingByUserId() {
+        List<Booking> response = bookingService.getBookingByUser();
+        return ResponseEntity.ok(response);
     }
 
 

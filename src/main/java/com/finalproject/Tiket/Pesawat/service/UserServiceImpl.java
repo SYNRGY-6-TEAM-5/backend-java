@@ -15,7 +15,6 @@ import com.finalproject.Tiket.Pesawat.security.service.UserDetailsImpl;
 import com.finalproject.Tiket.Pesawat.utils.Utils;
 import lombok.AllArgsConstructor;
 import lombok.extern.log4j.Log4j2;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -228,6 +227,7 @@ public class UserServiceImpl implements UserService {
                 return UserDetailsResponse.builder()
                         .success(true)
                         .id(user.getUuid().toString())
+                        .phoneNum(user.getPhoneNumber())
                         .imageUrl(imageUrl)
                         .fullName(user.getFullname())
                         .dob(user.getBirthDate())

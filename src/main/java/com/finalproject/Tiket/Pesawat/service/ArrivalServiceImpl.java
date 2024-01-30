@@ -4,15 +4,15 @@ import com.finalproject.Tiket.Pesawat.dto.arrival.response.ResponseListArrival;
 import com.finalproject.Tiket.Pesawat.exception.ExceptionHandling;
 import com.finalproject.Tiket.Pesawat.model.Arrival;
 import com.finalproject.Tiket.Pesawat.repository.ArrivalRepository;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 
 @Service
+@AllArgsConstructor
 public class ArrivalServiceImpl implements ArrivalService {
 
-    @Autowired
     private ArrivalRepository arrivalRepository;
 
     @Override
