@@ -18,5 +18,6 @@ public class UserDetailsResponse {
     private String fullName;
     private Date dob;
     private String roleName;
+    private Long phoneNum;
     private Date createdAt;
 }
