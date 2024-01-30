@@ -6,8 +6,8 @@ import com.finalproject.Tiket.Pesawat.security.jwt.AuthEntryPointJwt;
 import com.finalproject.Tiket.Pesawat.security.jwt.AuthTokenFilter;
 import com.finalproject.Tiket.Pesawat.security.service.UserDetailServiceImpl;
 import com.finalproject.Tiket.Pesawat.service.UserService;
+import lombok.AllArgsConstructor;
 import lombok.extern.log4j.Log4j2;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -28,19 +28,20 @@ import org.springframework.security.web.savedrequest.HttpSessionRequestCache;
 @Configuration
 @EnableMethodSecurity
 @Log4j2
+@AllArgsConstructor
 @EnableWebSecurity
 public class WebSecurityConfig {
 
-    @Autowired
+
     private AuthEntryPointJwt unauthorizedHandler;
 
-    @Autowired
+
     private UserDetailServiceImpl userDetailsService;
 
-    @Autowired
+
     private UserService userService;
 
-    @Autowired
+
     private RoleRepository roleRepository;
 
 
