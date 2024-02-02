@@ -7,17 +7,17 @@ import com.finalproject.Tiket.Pesawat.exception.InternalServerHandling;
 import com.finalproject.Tiket.Pesawat.model.Airport;
 import com.finalproject.Tiket.Pesawat.repository.AirportRepository;
 import com.finalproject.Tiket.Pesawat.specification.AirportSpecification;
-import lombok.AllArgsConstructor;
 import lombok.extern.log4j.Log4j2;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 
 @Service
 @Log4j2
-@AllArgsConstructor
 public class AirportServiceImpl implements AirportService {
 
+    @Autowired
     private AirportRepository airportRepository;
 
     @Override
