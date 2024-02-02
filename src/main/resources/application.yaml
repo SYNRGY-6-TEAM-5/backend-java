@@ -1,9 +1,9 @@
 # DB ONLINE
 spring:
   datasource:
-    url: jdbc:postgresql://db.xtpzfhfmldlmexwlchhl.supabase.co:5432/postgres
-    username: postgres
-    password: pAy*&2Ep%L98ZKq
+    url: ${SPRING_DATASOURCE_URL}
+    username: ${SPRING_DATASOURCE_USERNAME}
+    password: ${SPRING_DATASOURCE_PASSWORD}
     driverClassName: org.postgresql.Driver
 
 #spring:
