@@ -1,13 +1,11 @@
 package com.finalproject.Tiket.Pesawat.security;
 
 
-import com.finalproject.Tiket.Pesawat.repository.RoleRepository;
 import com.finalproject.Tiket.Pesawat.security.jwt.AuthEntryPointJwt;
 import com.finalproject.Tiket.Pesawat.security.jwt.AuthTokenFilter;
 import com.finalproject.Tiket.Pesawat.security.service.UserDetailServiceImpl;
-import com.finalproject.Tiket.Pesawat.service.UserService;
-import lombok.AllArgsConstructor;
 import lombok.extern.log4j.Log4j2;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -28,21 +26,20 @@ import org.springframework.security.web.savedrequest.HttpSessionRequestCache;
 @Configuration
 @EnableMethodSecurity
 @Log4j2
-@AllArgsConstructor
 @EnableWebSecurity
 public class WebSecurityConfig {
 
-
+    @Autowired
     private AuthEntryPointJwt unauthorizedHandler;
-
+    @Autowired
 
     private UserDetailServiceImpl userDetailsService;
 
-
-    private UserService userService;
-
-
-    private RoleRepository roleRepository;
+//    @Autowired
+//    private UserService userService;
+//
+//    @Autowired
+//    private RoleRepository roleRepository;
 
 
     @Bean
@@ -59,8 +56,8 @@ public class WebSecurityConfig {
                         auth
                                 .requestMatchers("/login/**", "/error/**",
                                         "swagger-ui/**", "/swagger-resources/**", "/swagger-resources",
-                                        "/webjars/**", "/v3/api-docs/**", "/configuration/ui","api/v1/auth/**"
-                                        ,"api/v1/airport/**","api/v1/arrival/**","api/v1/departure/**"
+                                        "/webjars/**", "/v3/api-docs/**", "/configuration/ui", "api/v1/auth/**"
+                                        , "api/v1/airport/**", "api/v1/arrival/**", "api/v1/departure/**"
                                 ).permitAll()
                                 .anyRequest()
                                 .authenticated())

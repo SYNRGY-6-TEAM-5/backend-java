@@ -13,8 +13,8 @@ import com.finalproject.Tiket.Pesawat.model.User;
 import com.finalproject.Tiket.Pesawat.repository.UserRepository;
 import com.finalproject.Tiket.Pesawat.security.service.UserDetailsImpl;
 import com.finalproject.Tiket.Pesawat.utils.Utils;
-import lombok.AllArgsConstructor;
 import lombok.extern.log4j.Log4j2;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -25,11 +25,11 @@ import java.util.Optional;
 
 @Service
 @Log4j2
-@AllArgsConstructor
 public class UserServiceImpl implements UserService {
 
+    @Autowired
     private CloudinaryService cloudinaryService;
-
+    @Autowired
     private UserRepository userRepository;
 
     @Override

@@ -17,7 +17,7 @@ import com.finalproject.Tiket.Pesawat.security.service.UserDetailsImpl;
 import com.finalproject.Tiket.Pesawat.service.AuthService;
 import com.finalproject.Tiket.Pesawat.service.OTPService;
 import jakarta.validation.Valid;
-import lombok.AllArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -32,15 +32,18 @@ import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/v1/auth")
-@AllArgsConstructor
 public class AuthController {
 
+    @Autowired
     private AuthenticationManager authenticationManager;
 
+    @Autowired
     private JwtUtils jwtUtils;
 
+    @Autowired
     private AuthService authService;
 
+    @Autowired
     private OTPService otpService;
 
     @PostMapping("/login")
