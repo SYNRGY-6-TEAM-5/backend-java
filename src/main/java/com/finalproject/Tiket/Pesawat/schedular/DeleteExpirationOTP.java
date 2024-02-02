@@ -4,8 +4,8 @@ import com.finalproject.Tiket.Pesawat.model.OtpForgotPassword;
 import com.finalproject.Tiket.Pesawat.model.OtpRegister;
 import com.finalproject.Tiket.Pesawat.repository.OtpForgotPasswordRepository;
 import com.finalproject.Tiket.Pesawat.repository.OtpRegisterRepository;
-import lombok.AllArgsConstructor;
 import lombok.extern.log4j.Log4j2;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
@@ -14,13 +14,13 @@ import java.util.List;
 
 @Component
 @Log4j2
-@AllArgsConstructor
 public class DeleteExpirationOTP {
 
 
+    @Autowired
     private OtpForgotPasswordRepository otpForgotPasswordRepository;
 
-
+    @Autowired
     private OtpRegisterRepository otpRegisterRepository;
 
     @Scheduled(fixedRate = 60000) // runs every 60 seconds

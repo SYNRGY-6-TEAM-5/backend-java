@@ -14,8 +14,8 @@ import com.finalproject.Tiket.Pesawat.repository.RoleRepository;
 import com.finalproject.Tiket.Pesawat.repository.UserRepository;
 import com.finalproject.Tiket.Pesawat.security.jwt.JwtUtils;
 import com.finalproject.Tiket.Pesawat.utils.Utils;
-import lombok.AllArgsConstructor;
 import lombok.extern.log4j.Log4j2;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -36,23 +36,24 @@ import static com.finalproject.Tiket.Pesawat.utils.Utils.getCurrentDateTimeAsDat
 
 @Log4j2
 @Service
-@AllArgsConstructor
+
 public class OTPServiceImpl implements OTPService {
 
+    @Autowired
     private OtpForgotPasswordRepository otpForgotPasswordRepository;
-
+    @Autowired
     private OtpRegisterRepository otpRegisterRepository;
-
+    @Autowired
     private EmailService emailService;
-
+    @Autowired
     private PasswordEncoder passwordEncoder;
-
+    @Autowired
     private RoleRepository roleRepository;
-
+    @Autowired
     private UserRepository userRepository;
-
+    @Autowired
     private AuthenticationManager authenticationManager;
-
+    @Autowired
     private JwtUtils jwtUtils;
     private static final long OTP_EXPIRATION_DURATION = 5 * 60 * 1000; // 5 minutes
 
