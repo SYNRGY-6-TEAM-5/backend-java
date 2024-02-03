@@ -227,6 +227,7 @@ public class UserServiceImpl implements UserService {
                 return UserDetailsResponse.builder()
                         .success(true)
                         .id(user.getUuid().toString())
+                        .email(user.getEmailAddress())
                         .phoneNum(user.getPhoneNumber())
                         .imageUrl(imageUrl)
                         .fullName(user.getFullname())

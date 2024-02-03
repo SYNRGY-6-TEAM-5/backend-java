@@ -14,6 +14,7 @@ import java.util.Date;
 public class UserDetailsResponse {
     private Boolean success;
     private String id;
+    private String email;
     private String imageUrl;
     private String fullName;
     private Date dob;
