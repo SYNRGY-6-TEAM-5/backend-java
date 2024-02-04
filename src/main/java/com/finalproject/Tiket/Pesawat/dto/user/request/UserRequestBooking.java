@@ -4,16 +4,16 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.Date;
+
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 public class UserRequestBooking {
 
-    private Integer booking_id;
-    private String user_id;
     private String tripe_type;
     private Integer total_passenger;
-    private String expired_time;
+    private Date expired_time;
     private Integer total_amount;
     private Boolean full_protection;
     private Boolean bag_insurance;
