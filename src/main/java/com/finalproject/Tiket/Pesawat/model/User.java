@@ -1,5 +1,6 @@
 package com.finalproject.Tiket.Pesawat.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import jdk.jfr.Timestamp;
 import lombok.AllArgsConstructor;
@@ -29,6 +30,7 @@ public class User {
     @Column(name = "email_address")
     private String emailAddress;
 
+    @JsonIgnore
     @Column(name = "password")
     private String password;
 
@@ -56,7 +58,7 @@ public class User {
     @Temporal(TemporalType.TIMESTAMP)
     private Date createdAt;
 
-    @Column
+    @Column(name = "last_modified")
     @Timestamp
     @Temporal(TemporalType.TIMESTAMP)
     private Date lastModified;

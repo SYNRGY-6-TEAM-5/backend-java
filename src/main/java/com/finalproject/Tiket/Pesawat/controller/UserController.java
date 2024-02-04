@@ -3,8 +3,10 @@ package com.finalproject.Tiket.Pesawat.controller;
 
 import com.finalproject.Tiket.Pesawat.dto.user.request.UpdateProfileRequest;
 import com.finalproject.Tiket.Pesawat.dto.user.request.UploadImageRequest;
+import com.finalproject.Tiket.Pesawat.dto.user.request.UserRequestBooking;
 import com.finalproject.Tiket.Pesawat.dto.user.response.UpdateProfileResponse;
 import com.finalproject.Tiket.Pesawat.dto.user.response.UploadFileResponse;
+import com.finalproject.Tiket.Pesawat.dto.user.response.UserBookingResponse;
 import com.finalproject.Tiket.Pesawat.dto.user.response.UserDetailsResponse;
 import com.finalproject.Tiket.Pesawat.model.Booking;
 import com.finalproject.Tiket.Pesawat.service.BookingService;
@@ -50,17 +52,6 @@ public class UserController {
     public ResponseEntity<UserDetailsResponse> getUserDetails() {
         UserDetailsResponse userDetailsResponse = userService.getUserDetails();
         return ResponseEntity.ok(userDetailsResponse);
-    }
-
-//    @PostMapping("/booking")
-//    public ResponseEntity<Booking> userCreateBooking(@Valid @RequestBody UserRequestBooking userRequestBooking) {
-//
-//    }
-
-    @GetMapping("/booking") // todo seharusnya berdasarkan userid/passengerid -> yang sedang login
-    public ResponseEntity<List<Booking>> getBookingByUserId() {
-        List<Booking> response = bookingService.getBookingByUser();
-        return ResponseEntity.ok(response);
     }
 
 
