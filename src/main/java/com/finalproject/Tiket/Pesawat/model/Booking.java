@@ -8,6 +8,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.util.Date;
+import java.util.List;
 
 @AllArgsConstructor
 @Data
@@ -65,5 +66,9 @@ public class Booking {
     @ManyToOne(fetch = FetchType.EAGER)
     private User user;
 
+    @OneToMany(mappedBy = "booking", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    private List<Passenger> passengers;
+
+    // join column tickets
 
 }
