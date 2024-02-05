@@ -8,24 +8,28 @@ import org.springframework.security.core.userdetails.UserDetails;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.UUID;
 
 @Log4j2
 public class UserDetailsImpl implements UserDetails {
 
     private String emailAddress;
     private String password;
+
+    private UUID userId;
     private List<GrantedAuthority> authorities;
 
-    public UserDetailsImpl(String emailAddress, String password, List<GrantedAuthority> authorities) {
+    public UserDetailsImpl(String emailAddress, String password, List<GrantedAuthority> authorities, UUID userId) {
         this.emailAddress = emailAddress;
         this.password = password;
         this.authorities = authorities;
+        this.userId = userId;
     }
 
     public static UserDetails build(User user) {
         String roleName = user.getRole().getRoleName().toString();
         List<GrantedAuthority> authorities = List.of(new SimpleGrantedAuthority(roleName));
-        return new UserDetailsImpl(user.getEmailAddress(), user.getPassword(), authorities);
+        return new UserDetailsImpl(user.getEmailAddress(), user.getPassword(), authorities, user.getUuid());
     }
 
     @Override
@@ -41,6 +45,10 @@ public class UserDetailsImpl implements UserDetails {
     @Override
     public String getUsername() {
         return emailAddress;
+    }
+
+    public UUID getUserId() {
+        return userId;
     }
 
     @Override

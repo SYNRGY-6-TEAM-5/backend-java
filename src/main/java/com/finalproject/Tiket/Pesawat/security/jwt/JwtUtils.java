@@ -34,6 +34,7 @@ public class JwtUtils {
                 .setSubject(userPrincipal.getUsername())
                 .claim("role", userPrincipal.getAuthorities().stream().map(GrantedAuthority::getAuthority)
                         .collect(Collectors.joining(","))) // Menambahkan role ke dalam claim
+                .claim("userId", userPrincipal.getUserId())  // Adding user ID to the claim
                 .setIssuedAt(now)
                 .setExpiration(new Date(now.getTime() + jwtExpirationMs))
                 .signWith(key(), SignatureAlgorithm.HS256)
