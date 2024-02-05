@@ -1,5 +1,7 @@
 package com.finalproject.Tiket.Pesawat.service;
 
+import com.finalproject.Tiket.Pesawat.dto.SuccesMessageDTO;
+import com.finalproject.Tiket.Pesawat.dto.booking.request.DeleteBookingRequest;
 import com.finalproject.Tiket.Pesawat.dto.user.request.UserRequestBooking;
 import com.finalproject.Tiket.Pesawat.dto.user.response.UserBookingResponse;
 import com.finalproject.Tiket.Pesawat.exception.ExceptionHandling;
@@ -12,6 +14,8 @@ import com.finalproject.Tiket.Pesawat.security.service.UserDetailsImpl;
 import com.finalproject.Tiket.Pesawat.utils.Utils;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
@@ -110,9 +114,40 @@ public class BookingServiceImpl implements BookingService {
 
         return UserBookingResponse.builder()
                 .success(true)
-                .bookingId(bookingUser.getBookingId().toString())  // Set the bookingId using the ID from the saved Booking entity
+                .bookingId(bookingUser.getBookingId().toString())
                 .message("success create booking")
                 .build();
 
     }
+
+    @Override
+    public List<Booking> getAllBooking(int page, int size) {
+        PageRequest pageable = PageRequest.of(page, size);
+        Page<Booking> bookingPage = bookingRepository.findAll(pageable);
+        if (bookingPage.isEmpty()){
+            throw new ExceptionHandling("Booking is Empty");
+        }
+        return bookingPage.getContent();
+    }
+
+    @Override
+    public SuccesMessageDTO deleteBookingById(DeleteBookingRequest deleteBookingRequest) {
+        try {
+            Optional<Booking> bookingOptional = bookingRepository.findById(deleteBookingRequest.getBookingId());
+            if (bookingOptional.isEmpty()){
+                throw new ExceptionHandling("Booking Not Found");
+            }
+
+            bookingRepository.delete(bookingOptional.get());
+
+        } catch (Exception e) {
+            log.error(e.getMessage());
+            throw new ExceptionHandling(e.getMessage());
+        }
+        return SuccesMessageDTO.builder()
+                .success(true)
+                .message("success delete booking")
+                .build();
+    }
 }
+
