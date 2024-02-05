@@ -1,5 +1,7 @@
 package com.finalproject.Tiket.Pesawat.service;
 
+import com.finalproject.Tiket.Pesawat.dto.SuccesMessageDTO;
+import com.finalproject.Tiket.Pesawat.dto.user.request.DeleteUserRequest;
 import com.finalproject.Tiket.Pesawat.dto.user.request.UpdateProfileRequest;
 import com.finalproject.Tiket.Pesawat.dto.user.request.UploadImageRequest;
 import com.finalproject.Tiket.Pesawat.dto.user.response.UpdateProfileResponse;
@@ -15,13 +17,17 @@ import com.finalproject.Tiket.Pesawat.security.service.UserDetailsImpl;
 import com.finalproject.Tiket.Pesawat.utils.Utils;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.http.MediaType;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 @Service
 @Log4j2
@@ -244,6 +250,36 @@ public class UserServiceImpl implements UserService {
             throw new ExceptionHandling(e.getMessage());
         }
         throw new UnauthorizedHandling("Unknown principal type");
+    }
+
+    @Override
+    public List<User> getAllUser(int page, int size) {
+        PageRequest pageable = PageRequest.of(page, size);
+        Page<User> userPage = userRepository.findAll(pageable);
+
+        if (userPage.isEmpty()) {
+            throw new ExceptionHandling("User Empty");
+        }
+
+        return userPage.getContent();
+    }
+
+    @Override
+    public SuccesMessageDTO deleteUserById(DeleteUserRequest deleteUserRequest) {
+        try {
+            Optional<User> userOptional = userRepository.findById(UUID.fromString(deleteUserRequest.getUserId()));
+            if (userOptional.isEmpty()){
+                throw new ExceptionHandling("User Not Found");
+            }
+            userRepository.delete(userOptional.get());
+        } catch (Exception e) {
+            log.error(e.getMessage());
+            throw new ExceptionHandling(e.getMessage());
+        }
+        return SuccesMessageDTO.builder()
+                .success(true)
+                .message("success delete user")
+                .build();
     }
 
 
