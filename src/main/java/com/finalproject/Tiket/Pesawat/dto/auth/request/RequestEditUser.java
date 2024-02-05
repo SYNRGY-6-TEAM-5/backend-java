@@ -11,7 +11,6 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-@ValidRetypePassword
 public class RequestEditUser {
     @Size(min = 8, message = "Password length min 8 character")
     private String newPassword;
