@@ -12,5 +12,6 @@ import lombok.NoArgsConstructor;
 @Builder
 public class UserBookingResponse {
     private Boolean success;
+    private String bookingId;
     private String message;
 }

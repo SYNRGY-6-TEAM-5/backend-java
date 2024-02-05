@@ -69,6 +69,7 @@ public class BookingServiceImpl implements BookingService {
 
     @Override
     public UserBookingResponse createBookingByUser(UserRequestBooking userRequestBooking) {
+        Booking bookingUser = null;
         try {
 
             Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
@@ -80,7 +81,7 @@ public class BookingServiceImpl implements BookingService {
                 if (userOptional.isEmpty()) {
                     throw new UnauthorizedHandling("User Not Found");
                 }
-                Booking bookingUser = Booking.builder()
+                bookingUser = Booking.builder()
                         .tripType(userRequestBooking.getTripe_type())
                         .totalPassenger(userRequestBooking.getTotal_passenger())
                         .expiredTime(userRequestBooking.getExpired_time())
@@ -109,7 +110,9 @@ public class BookingServiceImpl implements BookingService {
 
         return UserBookingResponse.builder()
                 .success(true)
+                .bookingId(bookingUser.getBookingId().toString())  // Set the bookingId using the ID from the saved Booking entity
                 .message("success create booking")
                 .build();
+
     }
 }
