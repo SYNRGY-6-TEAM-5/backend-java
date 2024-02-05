@@ -69,6 +69,12 @@ public class UserServiceImpl implements UserService {
                     throw new ExceptionHandling("File must be in JPG, JPEG, or PNG format");
                 }
 
+                }
+
+                if (!MediaType.IMAGE_JPEG.isCompatibleWith(MediaType.parseMediaType(contentType)) &&
+                        !MediaType.IMAGE_PNG.isCompatibleWith(MediaType.parseMediaType(contentType))) {
+                    throw new ExceptionHandling("File must be in JPG, JPEG, or PNG format");
+                }
                 String url = cloudinaryService.uploadFile(uploadImageRequest.getFile(), "user-images");
                 Images image = Images.builder()
                         .name(uploadImageRequest.getName())

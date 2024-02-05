@@ -119,7 +119,6 @@ public class BookingServiceImpl implements BookingService {
                 .build();
 
     }
-
     @Override
     public List<Booking> getAllBooking(int page, int size) {
         PageRequest pageable = PageRequest.of(page, size);
@@ -150,4 +149,3 @@ public class BookingServiceImpl implements BookingService {
                 .build();
     }
 }
-
