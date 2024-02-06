@@ -57,13 +57,14 @@ public class AuthController {
 
             UserDetailsImpl userDetails = (UserDetailsImpl) authentication.getPrincipal();
 
-            List<String> roles = userDetails.getAuthorities().stream()
-                    .map(item -> item.getAuthority())
-                    .collect(Collectors.toList());
-
-            return ResponseEntity.ok(new JwtResponse(jwt,
-                    userDetails.getUsername(),
-                    roles));
+            return ResponseEntity.ok(JwtResponse.builder()
+                    .token(jwt)
+                    .type("Bearer")
+                    .email(userDetails.getUsername())
+                    .roles(userDetails.getAuthorities().stream()
+                            .map(item -> item.getAuthority())
+                            .collect(Collectors.toList()))
+                    .build());
         } catch (BadCredentialsException e) {
             throw new UnauthorizedHandling("Failed Login, Wrong Email or Password");
         }

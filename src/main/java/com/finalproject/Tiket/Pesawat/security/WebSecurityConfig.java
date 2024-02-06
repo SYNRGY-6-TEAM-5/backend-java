@@ -20,6 +20,7 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.SimpleUrlAuthenticationFailureHandler;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.security.web.savedrequest.HttpSessionRequestCache;
 
@@ -31,9 +32,12 @@ public class WebSecurityConfig {
 
     @Autowired
     private AuthEntryPointJwt unauthorizedHandler;
-    @Autowired
 
+    @Autowired
     private UserDetailServiceImpl userDetailsService;
+
+    @Autowired
+    private CustomOauth2AuthenticationSuccessHandler customOAuth2AuthenticationSuccessHandler;
 
 //    @Autowired
 //    private UserService userService;
@@ -67,7 +71,12 @@ public class WebSecurityConfig {
 //                        httpSecurityLogoutConfigurer.logoutUrl("/api/v1/auth/logout")
 //                                .addLogoutHandler(LogoutService)
 //                                .logoutSuccessHandler(new HttpStatusReturningLogoutSuccessHandler(HttpStatus.OK)).permitAll())
-                .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
+                .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                .oauth2Login(oauth->{
+                    oauth.successHandler(customOAuth2AuthenticationSuccessHandler);
+//                    oauth.failureHandler(new
+//                            SimpleUrlAuthenticationFailureHandler("/login?error=true"));
+                });
 //                .oauth2Login(oauth ->
 //                                oauth.successHandler((request, response, authentication) -> {
 //                                            DefaultOidcUser oidcUser = (DefaultOidcUser) authentication.getPrincipal();
