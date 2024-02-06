@@ -134,7 +134,7 @@ public class OTPServiceImpl implements OTPService {
                 return OTPValidationResponse.builder()
                         .status(true)
                         .message("Success Validate OTP")
-                        .token("gak ada token cuman dummy test")
+                        .token(jwtUtils.generateDummyToken())
                         .build();
             }
 
