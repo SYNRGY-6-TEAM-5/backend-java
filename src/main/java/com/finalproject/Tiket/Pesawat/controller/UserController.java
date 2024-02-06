@@ -6,10 +6,6 @@ import com.finalproject.Tiket.Pesawat.dto.user.request.UploadImageRequest;
 import com.finalproject.Tiket.Pesawat.dto.user.response.UpdateProfileResponse;
 import com.finalproject.Tiket.Pesawat.dto.user.response.UploadFileResponse;
 import com.finalproject.Tiket.Pesawat.dto.user.response.UserDetailsResponse;
-import com.finalproject.Tiket.Pesawat.dto.user.request.UserRequestBooking;
-import com.finalproject.Tiket.Pesawat.dto.user.response.UserBookingResponse;
-import com.finalproject.Tiket.Pesawat.model.Booking;
-import com.finalproject.Tiket.Pesawat.service.BookingService;
 import com.finalproject.Tiket.Pesawat.service.UserService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,8 +15,6 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.util.List;
-
 @RestController
 @RequestMapping("/api/v1/user")
 //@PreAuthorize("hasRole('USER')")
@@ -28,9 +22,6 @@ public class UserController {
 
     @Autowired
     private UserService userService;
-
-    @Autowired
-    private BookingService bookingService;
 
 
     @PostMapping(value = "/profile-image", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)

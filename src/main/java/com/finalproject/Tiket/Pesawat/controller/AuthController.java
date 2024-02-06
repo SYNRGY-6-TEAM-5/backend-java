@@ -106,8 +106,7 @@ public class AuthController {
 
     @PutMapping("/forgot-password/edit-password")
     public ResponseEntity<Object> editPasswordUser(
-            @Valid @RequestBody RequestEditUser requestEditUser
-    ) {
+            @Valid @RequestBody RequestEditUser requestEditUser) {
         ResponseEditPassword response = authService.editPassUser(requestEditUser);
         return ResponseEntity.ok(response);
     }
