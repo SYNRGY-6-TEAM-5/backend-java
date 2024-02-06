@@ -16,6 +16,8 @@ import java.security.Key;
 import java.util.Date;
 import java.util.stream.Collectors;
 
+import static com.finalproject.Tiket.Pesawat.utils.Constants.CONSTANT_EMAIL_TEST_FORGOT;
+
 @Component
 @Log4j2
 public class JwtUtils {
@@ -41,8 +43,20 @@ public class JwtUtils {
                 .compact();
     }
 
+    public String generateDummyToken() {
+        Date now = new Date();
+        return Jwts.builder()
+                .setSubject(CONSTANT_EMAIL_TEST_FORGOT)
+                .claim("role", "USER")
+                .setIssuedAt(now)
+                .setExpiration(new Date(now.getTime() + jwtExpirationMs))
+                .signWith(key(), SignatureAlgorithm.HS256)
+                .compact();
+    }
 
-    private Key key() {
+
+
+    public Key key() {
         return Keys.hmacShaKeyFor(Decoders.BASE64.decode(jwtSecret));
     }
 

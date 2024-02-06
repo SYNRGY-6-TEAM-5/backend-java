@@ -44,56 +44,56 @@ public class UserServiceImpl implements UserService {
             Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
             Object principal = authentication.getPrincipal();
 
-            if (principal instanceof UserDetailsImpl) {
-                Optional<User> userOptional = userRepository
-                        .findByEmailAddress(((UserDetailsImpl) principal).getUsername());
-                if (userOptional.isEmpty()) {
-                    throw new UnauthorizedHandling("User Not Found");
-                }
-
-                log.info("user a " + ((UserDetailsImpl) principal).getUsername());
-                User user = userOptional.get();
-
-                if (uploadImageRequest.getFile() == null) {
-                    throw new ExceptionHandling("File is not provided");
-                }
-
-                String contentType = uploadImageRequest.getFile().getContentType();
-
-                if (contentType == null) {
-                    throw new ExceptionHandling("Content type is not provided");
-                }
-
-                if (!MediaType.IMAGE_JPEG.isCompatibleWith(MediaType.parseMediaType(contentType)) &&
-                        !MediaType.IMAGE_PNG.isCompatibleWith(MediaType.parseMediaType(contentType))) {
-                    throw new ExceptionHandling("File must be in JPG, JPEG, or PNG format");
-                }
-
-                String url = cloudinaryService.uploadFile(uploadImageRequest.getFile(), "user-images");
-                Images image = Images.builder()
-                        .name(uploadImageRequest.getName())
-                        .url(url)
-                        .build();
-
-                if (image.getUrl() == null) {
-                    return null;
-                }
-                user.setImages(image);
-                userRepository.save(user);
-                return UploadFileResponse.builder()
-                        .success(true)
-                        .urlImage(url)
-                        .message("Success upload image")
-                        .build();
-            } else if (principal instanceof String) {
+            if (!(principal instanceof UserDetailsImpl)) {
                 throw new UnauthorizedHandling("User not authenticated");
             }
 
+            UserDetailsImpl userDetails = (UserDetailsImpl) principal;
+            Optional<User> userOptional = userRepository.findByEmailAddress(userDetails.getUsername());
+
+            if (userOptional.isEmpty()) {
+                throw new UnauthorizedHandling("User Not Found");
+            }
+
+            User user = userOptional.get();
+
+            if (uploadImageRequest.getFile() == null) {
+                throw new ExceptionHandling("File is not provided");
+            }
+
+            String contentType = uploadImageRequest.getFile().getContentType();
+
+            if (contentType == null) {
+                throw new ExceptionHandling("Content type is not provided");
+            }
+
+            if (!MediaType.IMAGE_JPEG.isCompatibleWith(MediaType.parseMediaType(contentType)) &&
+                    !MediaType.IMAGE_PNG.isCompatibleWith(MediaType.parseMediaType(contentType))) {
+                throw new ExceptionHandling("File must be in JPG, JPEG, or PNG format");
+            }
+
+            String url = cloudinaryService.uploadFile(uploadImageRequest.getFile(), "user-images");
+            if (url == null) {
+                throw new ExceptionHandling("Error uploading file");
+            }
+
+            Images image = Images.builder()
+                    .name(uploadImageRequest.getName())
+                    .url(url)
+                    .build();
+
+            user.setImages(image);
+            userRepository.save(user);
+
+            return UploadFileResponse.builder()
+                    .success(true)
+                    .urlImage(url)
+                    .message("Success upload image")
+                    .build();
         } catch (Exception e) {
-            log.error(e.getMessage());
+            log.error(e.getMessage(), e);
             throw new ExceptionHandling(e.getMessage());
         }
-        throw new UnauthorizedHandling("Unknown principal type");
     }
 
     @Override
@@ -268,7 +268,7 @@ public class UserServiceImpl implements UserService {
     public SuccesMessageDTO deleteUserById(DeleteUserRequest deleteUserRequest) {
         try {
             Optional<User> userOptional = userRepository.findById(UUID.fromString(deleteUserRequest.getUserId()));
-            if (userOptional.isEmpty()){
+            if (userOptional.isEmpty()) {
                 throw new ExceptionHandling("User Not Found");
             }
             userRepository.delete(userOptional.get());
