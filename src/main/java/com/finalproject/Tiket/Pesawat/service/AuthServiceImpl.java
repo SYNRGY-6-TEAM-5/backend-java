@@ -112,7 +112,8 @@ public class AuthServiceImpl implements AuthService {
 
 
             if (principal instanceof UserDetailsImpl) {
-                if (((UserDetailsImpl) principal).getUsername().equals(CONSTANT_EMAIL_TEST_SIGNUP)){
+
+                if (((UserDetailsImpl) principal).getUsername().equals(CONSTANT_EMAIL_TEST_FORGOT)){
                     return ResponseEditPassword.builder()
                             .status(true)
                             .message("Success Update User Password")
