@@ -86,7 +86,6 @@ public class BookingServiceImpl implements BookingService {
                     throw new UnauthorizedHandling("User Not Found");
                 }
                 bookingUser = Booking.builder()
-                        .tripType(userRequestBooking.getTripe_type())
                         .totalPassenger(userRequestBooking.getTotal_passenger())
                         .expiredTime(userRequestBooking.getExpired_time())
                         .totalAmount(userRequestBooking.getTotal_amount())
