@@ -22,8 +22,8 @@ public class Passenger {
     @Column(name = "passanger_id")
     private Integer passengerId;
 
-//    @Column(name = "NIK")
-//    private String NIK;
+    @Column(name = "NIK")
+    private String NIK;
 
     @Column(name = "name")
     private String name;

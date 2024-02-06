@@ -27,6 +27,7 @@ import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 
 import static com.finalproject.Tiket.Pesawat.utils.Constants.CONSTANT_EMAIL_TEST_FORGOT;
+import static com.finalproject.Tiket.Pesawat.utils.Constants.CONSTANT_EMAIL_TEST_SIGNUP;
 
 @Service
 @Log4j2
@@ -73,7 +74,7 @@ public class AuthServiceImpl implements AuthService {
     @Async
     public SignUpResponse signUpUser(SignUpRequest signUpRequest) {
         Optional<User> userOptional = userRepository.findByEmailAddress(signUpRequest.getEmail());
-        if (userOptional.isPresent() && !signUpRequest.getEmail().equals("testAeroSwift@gmail.com")) {
+        if (userOptional.isPresent() && !signUpRequest.getEmail().equals(CONSTANT_EMAIL_TEST_SIGNUP)) {
             throw new EmailAlreadyRegisteredHandling();
         }
 
@@ -109,7 +110,15 @@ public class AuthServiceImpl implements AuthService {
             Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
             Object principal = authentication.getPrincipal();
 
+
             if (principal instanceof UserDetailsImpl) {
+                if (((UserDetailsImpl) principal).getUsername().equals(CONSTANT_EMAIL_TEST_SIGNUP)){
+                    return ResponseEditPassword.builder()
+                            .status(true)
+                            .message("Success Update User Password")
+                            .build();
+                }
+
                 Optional<User> userOptional = userRepository
                         .findByEmailAddress(((UserDetailsImpl) principal).getUsername());
                 if (userOptional.isEmpty()) {

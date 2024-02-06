@@ -23,8 +23,8 @@ public class Booking {
     @Column(name = "booking_id")
     private Integer bookingId;
 
-    @Column(name = "trip_type")
-    private String tripType;
+    @Column(name = "booking_code")
+    private String bookingCode;
 
     @Column(name = "total_passenger")
     private Integer totalPassenger;
