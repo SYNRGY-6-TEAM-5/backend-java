@@ -6,12 +6,12 @@ spring:
     password: ${SPRING_DATASOURCE_PASSWORD}
     driverClassName: org.postgresql.Driver
 
-#spring:
-#  datasource:
-#    url: jdbc:postgresql://localhost:5432/e_flight
-#    username: postgres
-#    password: Bangsat@123
-#    driverClassName: org.postgresql.Driver
+  #spring:
+  #  datasource:
+  #    url: jdbc:postgresql://localhost:5432/e_flight
+  #    username: postgres
+  #    password: Bangsat@123
+  #    driverClassName: org.postgresql.Driver
   flyway:
     enabled: true
     repair: true

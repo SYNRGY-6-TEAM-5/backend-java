@@ -11,7 +11,6 @@ import java.util.Date;
 @AllArgsConstructor
 public class UserRequestBooking {
 
-    private String tripe_type;
     private Integer total_passenger;
     private Date expired_time;
     private Integer total_amount;

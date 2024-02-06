@@ -7,7 +7,6 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-
 import java.util.Date;
 import java.util.List;
 
@@ -23,8 +22,8 @@ public class Passenger {
     @Column(name = "passanger_id")
     private Integer passengerId;
 
-//    @Column(name = "NIK")
-//    private String NIK;
+    @Column(name = "NIK")
+    private String NIK;
 
     @Column(name = "name")
     private String name;
