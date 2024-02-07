@@ -53,10 +53,11 @@ public class AuthController {
         try {
 
             if (loginDto.getEmailAddress().equals(CONSTANT_EMAIL_TEST_FORGOT)) {
-                return ResponseEntity.ok(OTPValidationResponse.builder()
-                        .status(true)
-                        .message("Success Login Dummy User")
+                return ResponseEntity.ok(JwtResponse.builder()
                         .token(jwtUtils.generateDummyToken())
+                        .type("Bearer")
+                        .email(CONSTANT_EMAIL_TEST_FORGOT)
+                        .roles(null)
                         .build());
             }
 
