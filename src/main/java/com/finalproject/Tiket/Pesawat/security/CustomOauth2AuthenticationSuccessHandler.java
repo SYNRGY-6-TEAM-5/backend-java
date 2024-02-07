@@ -21,8 +21,6 @@ import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.security.web.authentication.SimpleUrlAuthenticationSuccessHandler;
 
 import java.io.IOException;
-import java.util.Collections;
-import java.util.List;
 import java.util.stream.Collectors;
 
 @Configuration
@@ -45,15 +43,15 @@ public class CustomOauth2AuthenticationSuccessHandler extends SimpleUrlAuthentic
             OAuth2User oauth2User = ((OAuth2AuthenticationToken) authentication).getPrincipal();
 
             User user = userRepository.findByEmailAddress(oauth2User.getAttribute("email").toString()).orElse(null);
-            String email = oauth2User.getAttribute("email").toString();
-            log.info(email);
+
             if (user != null) {
                 UserDetails userDetails = UserDetailsImpl.build(user);
                 Authentication auth = new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
 
                 SecurityContextHolder.getContext().setAuthentication(auth);
                 String token = jwtUtils.generateToken(auth);
-
+                log.info(oauth2User.toString());
+                String email = oauth2User.getAttribute("email").toString();
                 JwtResponse jwtResponse = JwtResponse.builder()
                         .token(token)
                         .email(email)
@@ -71,11 +69,11 @@ public class CustomOauth2AuthenticationSuccessHandler extends SimpleUrlAuthentic
                 response.getWriter().flush();
                 log.info(jsonResponse);
             } else {
-                // Handle the case where the user doesn't exist -> disini upload
-                response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+                String email = oauth2User.getAttribute("email").toString();
+                String name = oauth2User.getAttributes().get("name").toString();
+                String imageUrl = oauth2User.getAttributes().get("picture").toString();
             }
         } else {
-            // Handle the error case
             response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
         }
     }

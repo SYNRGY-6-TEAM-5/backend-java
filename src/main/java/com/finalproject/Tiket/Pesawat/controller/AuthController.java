@@ -24,11 +24,13 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
 import java.util.stream.Collectors;
+
+import static com.finalproject.Tiket.Pesawat.utils.Constants.CONSTANT_EMAIL_TEST_FORGOT;
 
 @RestController
 @RequestMapping("/api/v1/auth")
@@ -49,6 +51,15 @@ public class AuthController {
     @PostMapping("/login")
     public ResponseEntity<?> login(@Valid @RequestBody LoginDto loginDto) {
         try {
+
+            if (loginDto.getEmailAddress().equals(CONSTANT_EMAIL_TEST_FORGOT)) {
+                return ResponseEntity.ok(OTPValidationResponse.builder()
+                        .status(true)
+                        .message("Success Login Dummy User")
+                        .token(jwtUtils.generateDummyToken())
+                        .build());
+            }
+
             Authentication authentication = authenticationManager.authenticate(
                     new UsernamePasswordAuthenticationToken(loginDto.getEmailAddress(), loginDto.getPassword()));
 
@@ -62,7 +73,7 @@ public class AuthController {
                     .type("Bearer")
                     .email(userDetails.getUsername())
                     .roles(userDetails.getAuthorities().stream()
-                            .map(item -> item.getAuthority())
+                            .map(GrantedAuthority::getAuthority)
                             .collect(Collectors.toList()))
                     .build());
         } catch (BadCredentialsException e) {
