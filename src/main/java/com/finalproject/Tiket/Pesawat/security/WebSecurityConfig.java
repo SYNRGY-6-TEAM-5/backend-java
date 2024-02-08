@@ -39,6 +39,7 @@ public class WebSecurityConfig {
 
     @Autowired
     private CustomOauth2AuthenticationSuccessHandler customOAuth2AuthenticationSuccessHandler;
+
     @Bean
     protected SecurityFilterChain filterChain(HttpSecurity http) throws Exception { //handle throw failed login
         HttpSessionRequestCache myReqeustCache = new HttpSessionRequestCache();
@@ -60,7 +61,10 @@ public class WebSecurityConfig {
                                 ).permitAll()
                                 .anyRequest()
                                 .authenticated())
-                .requiresChannel(require -> require.anyRequest().requiresSecure())
+                .requiresChannel(channel ->
+                        channel
+                                .requestMatchers(r -> r.getHeader("X-Forwarded-Proto") != null)
+                                .requiresSecure())
                 .httpBasic(basic -> basic.authenticationEntryPoint(unauthorizedHandler))
                 .exceptionHandling(Customizer.withDefaults())
 //                .logout(httpSecurityLogoutConfigurer ->
