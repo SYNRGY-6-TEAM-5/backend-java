@@ -45,6 +45,7 @@ public class WebSecurityConfig {
         myReqeustCache.setMatchingRequestParameterName(null);
         myReqeustCache.setCreateSessionAllowed(false);
 
+
         http
                 .securityContext(context -> context.requireExplicitSave(false))
                 .requestCache((cache) -> cache.requestCache(myReqeustCache))
@@ -55,7 +56,7 @@ public class WebSecurityConfig {
                                         "swagger-ui/**", "/swagger-resources/**", "/swagger-resources",
                                         "/webjars/**", "/v3/api-docs/**", "/configuration/ui", "api/v1/auth/**"
                                         , "api/v1/airport/**", "api/v1/arrival/**", "api/v1/departure/**",
-                                        "api/v1/payment/**"
+                                        "api/v1/payment/**", "api/v1/server/**" // todo harus mengubah payment agar auth
                                 ).permitAll()
                                 .anyRequest()
                                 .authenticated())
