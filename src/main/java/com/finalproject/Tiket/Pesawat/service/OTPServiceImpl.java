@@ -30,8 +30,7 @@ import java.util.Optional;
 import java.util.Random;
 import java.util.concurrent.CompletableFuture;
 
-import static com.finalproject.Tiket.Pesawat.utils.Constants.CONSTANT_EMAIL_TEST_FORGOT;
-import static com.finalproject.Tiket.Pesawat.utils.Constants.CONSTANT_EMAIL_TEST_SIGNUP;
+import static com.finalproject.Tiket.Pesawat.utils.Constants.*;
 import static com.finalproject.Tiket.Pesawat.utils.Utils.getCurrentDateTimeAsDate;
 
 @Log4j2
@@ -55,7 +54,6 @@ public class OTPServiceImpl implements OTPService {
     private AuthenticationManager authenticationManager;
     @Autowired
     private JwtUtils jwtUtils;
-    private static final long OTP_EXPIRATION_DURATION = 5 * 60 * 1000; // 5 minutes
 
     @Override
     public OtpForgotPassword generateOTPForgotPassword(String email) {
@@ -74,7 +72,7 @@ public class OTPServiceImpl implements OTPService {
             otpForgotPassword.setEmailUser(email);
             otpForgotPassword.setOtp("1234");
             otpForgotPassword.setGenerateDate(getCurrentDateTimeAsDate());
-            otpForgotPassword.setExpirationDate(new Date(System.currentTimeMillis() + OTP_EXPIRATION_DURATION));
+            otpForgotPassword.setExpirationDate(new Date(System.currentTimeMillis()));
             otpForgotPasswordRepository.save(otpForgotPassword);
             return otpForgotPassword;
         }

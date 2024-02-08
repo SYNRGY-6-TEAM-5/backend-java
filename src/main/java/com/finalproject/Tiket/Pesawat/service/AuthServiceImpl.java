@@ -43,8 +43,8 @@ public class AuthServiceImpl implements AuthService {
     @Override
     public ForgotPasswordResponse forgotPasswordUser(ForgotPasswordRequest request) {
         ForgotPasswordResponse response = new ForgotPasswordResponse();
-        log.info(request.getEmail() + " dann " + CONSTANT_EMAIL_TEST_FORGOT);
         Optional<User> userOptional = userRepository.findByEmailAddress(request.getEmail());
+
         if (userOptional.isEmpty() && !request.getEmail().equals(CONSTANT_EMAIL_TEST_FORGOT)) {
             throw new ExceptionHandling("Email Not Found");
         }
@@ -54,7 +54,6 @@ public class AuthServiceImpl implements AuthService {
         CompletableFuture<Boolean> sendOtpFuture = otpService.
                 sendOTPByEmailForgotPassword(request.getEmail(), otp.getOtp());
         try {
-
             boolean otpSent = sendOtpFuture.get();
             if (otpSent) {
                 response.setSuccess(true);

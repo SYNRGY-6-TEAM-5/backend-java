@@ -59,8 +59,13 @@ springdoc:
 aeroswift:
   openapi:
     dev-url: https://backend-java-production-ece2.up.railway.app
-
+  stripe:
+    apikey: sk_test_51OhAu5JzTxH2i8XQcwq7Kir0CnJuSX39GndWEet2l9BoQBCfLq2cVYmG6lpUA768d49ARAdjlVJSFynFGChdaNXv00FZdBUQN5
+    endpointSecret: whsec_be6d6552dca7e1f3012fb5409f0e75d403194ecf8aca7629c9ad3be524ce7f24
+  xendit:
+    secretkey: xnd_development_QdWD1ZzrgAbOT9NOWdqEZsDYQpDQF7DU2OKQ3gDe1W0FfCd5IXPtsMuNanjEMCM
 server:
   error:
     include-binding-errors: always
     include-message: always
+
