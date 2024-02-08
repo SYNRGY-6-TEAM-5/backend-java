@@ -60,6 +60,7 @@ public class WebSecurityConfig {
                                 ).permitAll()
                                 .anyRequest()
                                 .authenticated())
+                .requiresChannel(require -> require.anyRequest().requiresSecure())
                 .httpBasic(basic -> basic.authenticationEntryPoint(unauthorizedHandler))
                 .exceptionHandling(Customizer.withDefaults())
 //                .logout(httpSecurityLogoutConfigurer ->
