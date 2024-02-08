@@ -1,9 +1,11 @@
 package com.finalproject.Tiket.Pesawat.security;
 
 
+import com.finalproject.Tiket.Pesawat.repository.RoleRepository;
 import com.finalproject.Tiket.Pesawat.security.jwt.AuthEntryPointJwt;
 import com.finalproject.Tiket.Pesawat.security.jwt.AuthTokenFilter;
 import com.finalproject.Tiket.Pesawat.security.service.UserDetailServiceImpl;
+import com.finalproject.Tiket.Pesawat.service.UserService;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
@@ -31,17 +33,12 @@ public class WebSecurityConfig {
 
     @Autowired
     private AuthEntryPointJwt unauthorizedHandler;
-    @Autowired
 
+    @Autowired
     private UserDetailServiceImpl userDetailsService;
 
-//    @Autowired
-//    private UserService userService;
-//
-//    @Autowired
-//    private RoleRepository roleRepository;
-
-
+    @Autowired
+    private CustomOauth2AuthenticationSuccessHandler customOAuth2AuthenticationSuccessHandler;
     @Bean
     protected SecurityFilterChain filterChain(HttpSecurity http) throws Exception { //handle throw failed login
         HttpSessionRequestCache myReqeustCache = new HttpSessionRequestCache();
@@ -57,7 +54,8 @@ public class WebSecurityConfig {
                                 .requestMatchers("/login/**", "/error/**",
                                         "swagger-ui/**", "/swagger-resources/**", "/swagger-resources",
                                         "/webjars/**", "/v3/api-docs/**", "/configuration/ui", "api/v1/auth/**"
-                                        , "api/v1/airport/**", "api/v1/arrival/**", "api/v1/departure/**"
+                                        , "api/v1/airport/**", "api/v1/arrival/**", "api/v1/departure/**",
+                                        "api/v1/payment/**"
                                 ).permitAll()
                                 .anyRequest()
                                 .authenticated())
@@ -67,29 +65,12 @@ public class WebSecurityConfig {
 //                        httpSecurityLogoutConfigurer.logoutUrl("/api/v1/auth/logout")
 //                                .addLogoutHandler(LogoutService)
 //                                .logoutSuccessHandler(new HttpStatusReturningLogoutSuccessHandler(HttpStatus.OK)).permitAll())
-                .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
-//                .oauth2Login(oauth ->
-//                                oauth.successHandler((request, response, authentication) -> {
-//                                            DefaultOidcUser oidcUser = (DefaultOidcUser) authentication.getPrincipal();
-////                                    Optional<Role> optionalUserRole = roleRepository.findByRoleName(EnumRole.USER);
-//
-//                                            User user = User.builder()
-//                                                    .emailAddress(oidcUser.getAttribute("email"))
-//                                                    .fullname(oidcUser.getAttribute("name"))
-//                                                    .isActive(true)
-////                                            .role(optionalUserRole.get())
-//                                                    .build();
-//                                            Boolean saveUser = userService.saveNewUserFromOauth2(user, oidcUser.getAttribute("picture"));
-//
-//                                            if (saveUser) {
-//                                                log.info("sukses create user");
-//                                            } else {
-//                                                log.info("failed create user");
-//                                            }
-//                                            log.info(oidcUser.getAttribute("name") + " " + oidcUser.getAttribute("email"));
-//                                        })
-//                                        .defaultSuccessUrl("/api/v1/auth/user", true) // todo handle redirect URL
-//                );
+                .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                .oauth2Login(oauth -> {
+                    oauth.successHandler(customOAuth2AuthenticationSuccessHandler);
+//                    oauth.failureHandler(new
+//                            SimpleUrlAuthenticationFailureHandler("/login?error=true"));
+                });
 
         http.authenticationProvider(authenticationProvider());
         http.addFilterBefore(authJwtTokenFilter(), UsernamePasswordAuthenticationFilter.class);

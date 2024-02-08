@@ -1,19 +1,19 @@
 package com.finalproject.Tiket.Pesawat.payload.response;
 
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import java.util.List;
 
 @Data
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
 public class JwtResponse {
     private String token;
     private String type = "Bearer";
     private String email;
     private List<String> roles;
-
-    public JwtResponse(String accessToken,  String email, List<String> roles) {
-        this.token = accessToken;
-        this.email = email;
-        this.roles = roles;
-    }
 }

@@ -154,32 +154,6 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public Boolean saveNewUserFromOauth2(User user, String imageUrl) {
-        try {
-            Optional<User> userOptional = userRepository.findByEmailAddress(user.getEmailAddress());
-            if (userOptional.isPresent()) {
-                throw new EmailAlreadyRegisteredHandling();
-            }
-//            Optional<Role> optionalUserRole = roleRepository.findByRoleName(EnumRole.USER);
-            Images image = Images.builder()
-                    .name(user.getFullname())
-                    .url(imageUrl)
-                    .build();
-
-//            user.setRole(); todo
-            user.setImages(image);
-            user.setFullname(user.getFullname());
-            user.setCreatedAt(Utils.getCurrentDateTimeAsDate());
-            userRepository.save(user);
-            log.info("sukses create user");
-        } catch (Exception e) {
-            log.error("Failed Save new Oauth2 User " + e.getMessage());
-            return false;
-        }
-        return true;
-    }
-
-    @Override
     public UpdateProfileResponse editProfile(UpdateProfileRequest updateProfileRequest) {
         // get signed
         try {

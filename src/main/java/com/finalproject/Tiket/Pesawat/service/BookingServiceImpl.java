@@ -20,8 +20,12 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
+import java.util.Date;
 import java.util.List;
 import java.util.Optional;
+
+import static com.finalproject.Tiket.Pesawat.utils.Constants.CONSTANT_PAYMENT_STATUS_PENDING;
+import static com.finalproject.Tiket.Pesawat.utils.Constants.PAYMENT_EXPIRED_TIME;
 
 @Service
 @Log4j2
@@ -86,13 +90,13 @@ public class BookingServiceImpl implements BookingService {
                 }
                 bookingUser = Booking.builder()
                         .totalPassenger(userRequestBooking.getTotal_passenger())
-                        .expiredTime(userRequestBooking.getExpired_time())
+                        .expiredTime(new Date(System.currentTimeMillis() + PAYMENT_EXPIRED_TIME))
                         .totalAmount(userRequestBooking.getTotal_amount())
                         .fullProtection(userRequestBooking.getFull_protection())
                         .bagInsurance(userRequestBooking.getBag_insurance())
+                        .status(CONSTANT_PAYMENT_STATUS_PENDING)
                         .flightDelay(userRequestBooking.getFlight_delay())
                         .paymentMethod(userRequestBooking.getPayment_method())
-                        .status(userRequestBooking.getStatus())
                         .createdAt(Utils.getCurrentDateTimeAsDate())
                         .user(userOptional.get())
                         .createdAt(Utils.getCurrentDateTimeAsDate())
@@ -117,11 +121,12 @@ public class BookingServiceImpl implements BookingService {
                 .build();
 
     }
+
     @Override
     public List<Booking> getAllBooking(int page, int size) {
         PageRequest pageable = PageRequest.of(page, size);
         Page<Booking> bookingPage = bookingRepository.findAll(pageable);
-        if (bookingPage.isEmpty()){
+        if (bookingPage.isEmpty()) {
             throw new ExceptionHandling("Booking is Empty");
         }
         return bookingPage.getContent();
@@ -131,7 +136,7 @@ public class BookingServiceImpl implements BookingService {
     public SuccesMessageDTO deleteBookingById(DeleteBookingRequest deleteBookingRequest) {
         try {
             Optional<Booking> bookingOptional = bookingRepository.findById(deleteBookingRequest.getBookingId());
-            if (bookingOptional.isEmpty()){
+            if (bookingOptional.isEmpty()) {
                 throw new ExceptionHandling("Booking Not Found");
             }
 
