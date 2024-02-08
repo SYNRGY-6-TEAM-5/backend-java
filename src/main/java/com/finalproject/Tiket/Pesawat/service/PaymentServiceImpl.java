@@ -31,6 +31,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
@@ -156,7 +157,7 @@ public class PaymentServiceImpl implements PaymentService {
     public String createPaymentXendit() {
         Xendit.apiKey = xenditSecretkey;
         Map<String, Object> params = new HashMap<>();
-        params.put("external_id", "my_external_id");
+        params.put("external_id", "my_external_id" + new Date());
         params.put("bank_code", BankCode.BNI.getText());
         params.put("name", "John Doe");
 
@@ -167,7 +168,9 @@ public class PaymentServiceImpl implements PaymentService {
             log.error(e.getMessage());
         }
 
+
         log.info(virtualAccount.getAccountNumber());
+        virtualAccount.setStatus("PENDING");
 
         return virtualAccount.getId();
     }
