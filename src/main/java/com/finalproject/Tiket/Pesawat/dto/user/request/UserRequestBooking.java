@@ -6,8 +6,6 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.util.Date;
-
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
@@ -16,9 +14,6 @@ public class UserRequestBooking {
     @NotNull(message = "Total passenger cannot be null")
     @Min(value = 1, message = "Total passenger must be at least 1")
     private Integer total_passenger;
-
-    @NotNull(message = "Expired time cannot be null")
-    private Date expired_time;
 
     @NotNull(message = "Total amount cannot be null")
     @Min(value = 0, message = "Total amount cannot be negative")
@@ -35,8 +30,4 @@ public class UserRequestBooking {
 
     @NotNull(message = "Payment method cannot be null")
     private String payment_method;
-
-    @NotNull(message = "Status cannot be null")
-    private String status;
-
 }

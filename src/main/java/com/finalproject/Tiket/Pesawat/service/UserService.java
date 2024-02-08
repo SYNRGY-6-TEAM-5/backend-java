@@ -16,9 +16,6 @@ public interface UserService {
 
     UploadFileResponse uploadFile(UploadImageRequest uploadImageRequest);
     UploadFileResponse editFile(MultipartFile file);
-
-    Boolean saveNewUserFromOauth2(User user, String imageUrl);
-
     UpdateProfileResponse editProfile(UpdateProfileRequest updateProfileRequest);
 
     UserDetailsResponse getUserDetails();

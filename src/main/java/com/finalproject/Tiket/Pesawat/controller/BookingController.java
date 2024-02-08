@@ -24,7 +24,7 @@ public class BookingController {
         return ResponseEntity.ok(response);
     }
 
-    @GetMapping // todo seharusnya berdasarkan userid/passengerid -> yang sedang login
+    @GetMapping
     public ResponseEntity<List<Booking>> getBookingByUserId() {
         List<Booking> response = bookingService.getBookingByUser();
         return ResponseEntity.ok(response);

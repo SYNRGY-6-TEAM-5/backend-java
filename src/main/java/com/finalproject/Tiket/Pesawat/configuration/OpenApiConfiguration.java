@@ -28,7 +28,7 @@ import java.util.List;
                 scheme = "bearer"
         )
 })
-public class OpenApiConfiguration {
+public class  OpenApiConfiguration {
         @Value("${aeroswift.openapi.dev-url}")
         private String devUrl;
 
