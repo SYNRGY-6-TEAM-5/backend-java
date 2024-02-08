@@ -6,17 +6,23 @@ import org.springframework.boot.autoconfigure.web.ServerProperties;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.core.env.Environment;
+
 
 @RestController
 @RequestMapping("/api/v1/server")
 @Log4j2
 public class ServerController {
+
     @Autowired
-    private ServerProperties serverProperties;
+    private Environment env;
 
     @GetMapping("/check-protocol")
-    public String getProtocol() {
-        log.info("executing get protocol");
-        return serverProperties.getSsl() != null ? "HTTPS" : "HTTP";
+    public String checkProtocol() {
+        String protocol = "http";
+        if (env.getProperty("server.ssl.key-store") != null) {
+            protocol = "https";
+        }
+        return "Current protocol is " + protocol;
     }
 }
