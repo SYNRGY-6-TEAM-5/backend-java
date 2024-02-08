@@ -57,25 +57,25 @@ public class CustomOauth2AuthenticationSuccessHandler extends SimpleUrlAuthentic
             User user = userRepository.findByEmailAddress(oauth2User.getAttribute("email").toString()).orElse(null);
 
             if (user != null) {
-                handleExistingUser(user, oauth2User, response);
+                handleExistingUser(user, oauth2User, response, request);
             } else {
-                handleNewUser(oauth2User, response);
+                handleNewUser(oauth2User, response, request);
             }
         } else {
             response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
         }
     }
 
-    private void handleExistingUser(User user, OAuth2User oauth2User, HttpServletResponse response) throws IOException {
+    private void handleExistingUser(User user, OAuth2User oauth2User, HttpServletResponse response, HttpServletRequest request) throws IOException {
         UserDetails userDetails = UserDetailsImpl.build(user);
         Authentication auth = new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
         SecurityContextHolder.getContext().setAuthentication(auth);
         String token = jwtUtils.generateToken(auth);
         log.info(oauth2User.toString());
-        sendJwtResponse(oauth2User.getAttribute("email").toString(), token, userDetails.getAuthorities(), response);
+        sendJwtResponse(oauth2User.getAttribute("email").toString(), token, userDetails.getAuthorities(), response, request);
     }
 
-    private void handleNewUser(OAuth2User oauth2User, HttpServletResponse response) throws IOException {
+    private void handleNewUser(OAuth2User oauth2User, HttpServletResponse response, HttpServletRequest request) throws IOException {
         String email = oauth2User.getAttribute("email").toString();
         String name = oauth2User.getAttributes().get("name").toString();
         String imageUrl = oauth2User.getAttributes().get("picture").toString();
@@ -104,10 +104,10 @@ public class CustomOauth2AuthenticationSuccessHandler extends SimpleUrlAuthentic
         SecurityContextHolder.getContext().setAuthentication(auth);
         String token = jwtUtils.generateToken(auth);
         log.info(oauth2User.toString());
-        sendJwtResponse(email, token, userDetails.getAuthorities(), response);
+        sendJwtResponse(email, token, userDetails.getAuthorities(), response, request);
     }
 
-    private void sendJwtResponse(String email, String token, Collection<? extends GrantedAuthority> authorities, HttpServletResponse response) throws IOException {
+    private void sendJwtResponse(String email, String token, Collection<? extends GrantedAuthority> authorities, HttpServletResponse response, HttpServletRequest request) throws IOException {
         JwtResponse jwtResponse = JwtResponse.builder()
                 .token(token)
                 .email(email)
@@ -123,6 +123,8 @@ public class CustomOauth2AuthenticationSuccessHandler extends SimpleUrlAuthentic
         response.setContentType("application/json");
         response.getWriter().write(jsonResponse);
         response.getWriter().flush();
+        String redirectUrl = request.getRequestURL().toString().replace("http:", "https:");
+        response.sendRedirect(redirectUrl);
         log.info(jsonResponse);
     }
 }
