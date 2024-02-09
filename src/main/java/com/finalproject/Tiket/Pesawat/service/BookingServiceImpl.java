@@ -25,7 +25,6 @@ import java.util.List;
 import java.util.Optional;
 
 import static com.finalproject.Tiket.Pesawat.utils.Constants.CONSTANT_PAYMENT_STATUS_PENDING;
-import static com.finalproject.Tiket.Pesawat.utils.Constants.PAYMENT_EXPIRED_TIME;
 
 @Service
 @Log4j2
@@ -90,7 +89,6 @@ public class BookingServiceImpl implements BookingService {
                 }
                 bookingUser = Booking.builder()
                         .totalPassenger(userRequestBooking.getTotal_passenger())
-                        .expiredTime(new Date(System.currentTimeMillis() + PAYMENT_EXPIRED_TIME))
                         .totalAmount(userRequestBooking.getTotal_amount())
                         .fullProtection(userRequestBooking.getFull_protection())
                         .bagInsurance(userRequestBooking.getBag_insurance())

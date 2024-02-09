@@ -1,11 +1,9 @@
 package com.finalproject.Tiket.Pesawat.security;
 
 
-import com.finalproject.Tiket.Pesawat.repository.RoleRepository;
 import com.finalproject.Tiket.Pesawat.security.jwt.AuthEntryPointJwt;
 import com.finalproject.Tiket.Pesawat.security.jwt.AuthTokenFilter;
 import com.finalproject.Tiket.Pesawat.security.service.UserDetailServiceImpl;
-import com.finalproject.Tiket.Pesawat.service.UserService;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;

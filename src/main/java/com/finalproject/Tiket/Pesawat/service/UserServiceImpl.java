@@ -7,7 +7,6 @@ import com.finalproject.Tiket.Pesawat.dto.user.request.UploadImageRequest;
 import com.finalproject.Tiket.Pesawat.dto.user.response.UpdateProfileResponse;
 import com.finalproject.Tiket.Pesawat.dto.user.response.UploadFileResponse;
 import com.finalproject.Tiket.Pesawat.dto.user.response.UserDetailsResponse;
-import com.finalproject.Tiket.Pesawat.exception.EmailAlreadyRegisteredHandling;
 import com.finalproject.Tiket.Pesawat.exception.ExceptionHandling;
 import com.finalproject.Tiket.Pesawat.exception.UnauthorizedHandling;
 import com.finalproject.Tiket.Pesawat.model.Images;

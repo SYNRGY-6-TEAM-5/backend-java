@@ -16,6 +16,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -28,8 +29,6 @@ import org.springframework.security.web.authentication.SimpleUrlAuthenticationSu
 
 import java.io.IOException;
 import java.util.Collection;
-import java.util.Optional;
-import java.util.UUID;
 import java.util.stream.Collectors;
 
 @Configuration
@@ -44,6 +43,9 @@ public class CustomOauth2AuthenticationSuccessHandler extends SimpleUrlAuthentic
 
     @Autowired
     private RoleRepository roleRepository;
+
+//    @Value("${frontend.url}")
+//    private String frontendUrl;
 
     @Override
     public void onAuthenticationSuccess(
@@ -64,6 +66,9 @@ public class CustomOauth2AuthenticationSuccessHandler extends SimpleUrlAuthentic
         } else {
             response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
         }
+        this.setAlwaysUseDefaultTargetUrl(true);
+        this.setDefaultTargetUrl("http://localhost:3000");
+        super.onAuthenticationSuccess(request, response, authentication);
     }
 
     private void handleExistingUser(User user, OAuth2User oauth2User, HttpServletResponse response, HttpServletRequest request) throws IOException {
@@ -124,6 +129,7 @@ public class CustomOauth2AuthenticationSuccessHandler extends SimpleUrlAuthentic
         response.getWriter().write(jsonResponse);
         response.getWriter().flush();
         String redirectUrl = request.getRequestURL().toString().replace("http:", "https:");
+
         response.sendRedirect(redirectUrl);
         log.info(jsonResponse);
     }
