@@ -1,11 +1,10 @@
 # DB ONLINE
 spring:
   datasource:
-    url: ${SPRING_DATASOURCE_URL}
-    username: ${SPRING_DATASOURCE_USERNAME}
-    password: ${SPRING_DATASOURCE_PASSWORD}
+    url: jdbc:postgresql://aeroswiftdb.clocye2qaw3p.ap-southeast-1.rds.amazonaws.com:5432/postgres
+    username: postgres
+    password: pAy&2Ep%L98ZKq
     driverClassName: org.postgresql.Driver
-
 
   #spring:
   #  datasource:
@@ -43,12 +42,12 @@ spring:
           google:
             client-id: 724857527525-3kehgvohkiimvhj9vj3pijois33kn1id.apps.googleusercontent.com
             client-secret: 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
-            redirect-uri: https://localhost:8080/login/oauth2/code/google
+            redirect-uri: https://backend-java-production-ece2.up.railway.app/login/oauth2/code/google
 binar:
   app:
     jwtSecret: 357638792F423F4428472B4B6250655368566D597133743677397A2443264629
     jwtExpirationMs: 3600000
-    baseUrl: http://localhost:8080/api/
+    baseUrl: http://backend-java-production-ece2.up.railway.app/api/
 
 cloudinary:
   cloud_name: drpx4fqwg
