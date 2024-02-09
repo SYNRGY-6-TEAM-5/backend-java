@@ -22,29 +22,29 @@ public class PaymentController {
     @Autowired
     private PaymentService paymentService;
 
-    @GetMapping("/payment-session")
-    public ResponseEntity<PaymentResponseDTO> createPaymentSession() {
+//    @GetMapping("/payment-session")
+//    public ResponseEntity<PaymentResponseDTO> createPaymentSession() {
+//
+//        log.info("create session");
+//        StripeDTO stripeDto = StripeDTO.builder()
+//                .amount(15000D)
+//                .build();
+//
+//        try {
+//            PaymentResponseDTO response = paymentService.createPaymentSession(stripeDto);
+//            return ResponseEntity.ok(response);
+//
+//        } catch (StripeException e) {
+//            log.error(e.getMessage());
+//            return  new ResponseEntity(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+//        }
+//    }
 
-        log.info("create session");
-        StripeDTO stripeDto = StripeDTO.builder()
-                .amount(15000D)
-                .build();
-
-        try {
-            PaymentResponseDTO response = paymentService.createPaymentSession(stripeDto);
-            return ResponseEntity.ok(response);
-
-        } catch (StripeException e) {
-            log.error(e.getMessage());
-            return  new ResponseEntity(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
-        }
-    }
-
-    @PostMapping("/webhook")
-    public Object webhook(HttpServletRequest request, HttpServletResponse response, @RequestBody String payload){
-        log.info("executing webhook...");
-        return paymentService.webhook(request, response, payload);
-    }
+//    @PostMapping("/webhook")
+//    public Object webhook(HttpServletRequest request, HttpServletResponse response, @RequestBody String payload) {
+//        log.info("executing webhook...");
+//        return paymentService.webhook(request, response, payload);
+//    }
 
     @GetMapping("/success-payment")
     public ModelAndView showSuccessPage() {
@@ -60,17 +60,25 @@ public class PaymentController {
         return modelAndView;
     }
 
-    @GetMapping("/xendit-payment")
-    public ResponseEntity paymentXendit() {
-        String response = paymentService.createPaymentXendit();
+    @GetMapping("/xendit-payment/create-va")
+    public ResponseEntity<PaymentResponseDTO> paymentXendit() {
+        PaymentResponseDTO response = paymentService.createPaymentXendit();
         return ResponseEntity.ok(response);
     }
 
-    @PostMapping("/xendint-payment/webhook")
-    public ResponseEntity webhookXenditCreate(HttpServletRequest request, HttpServletResponse response,
-                                              @RequestBody RequestWebhookXendit requestWebhook){
+    @PostMapping("/xendit-payment/webhook-create")
+    public ResponseEntity webhookXenditCreate(@RequestHeader("x-callback-token") String xCallbackToken,
+                                              @RequestBody RequestWebhookXendit requestWebhook) {
         log.info("executing webhhook");
-//        String response = paymentService.createVirtualAccountXenditWebhook(requestWebhook);
-        return ResponseEntity.ok(requestWebhook);
+        String response = paymentService.createVirtualAccountXenditWebhook(xCallbackToken, requestWebhook);
+        return ResponseEntity.ok(response);
+    }
+
+    @PostMapping("/xendit-payment/webhook-paid")
+    public ResponseEntity webhookXenditPaid(@RequestHeader("x-callback-token") String xCallbackToken,
+                                            @RequestBody RequestWebhookXendit requestWebhook) {
+        log.info("executing webhhook");
+        String responseWebhook = paymentService.paidXenditVirtualAccountWebhook(xCallbackToken, requestWebhook);
+        return ResponseEntity.ok(responseWebhook);
     }
 }

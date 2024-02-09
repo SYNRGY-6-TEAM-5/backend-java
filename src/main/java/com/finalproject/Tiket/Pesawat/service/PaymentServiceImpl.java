@@ -3,6 +3,7 @@ package com.finalproject.Tiket.Pesawat.service;
 import com.finalproject.Tiket.Pesawat.dto.PaymentResponseDTO;
 import com.finalproject.Tiket.Pesawat.dto.StripeDTO;
 import com.finalproject.Tiket.Pesawat.dto.payment.request.RequestWebhookXendit;
+import com.finalproject.Tiket.Pesawat.dto.user.response.UserDetailsResponse;
 import com.finalproject.Tiket.Pesawat.exception.ExceptionHandling;
 import com.finalproject.Tiket.Pesawat.exception.UnauthorizedHandling;
 import com.finalproject.Tiket.Pesawat.model.Booking;
@@ -57,35 +58,38 @@ public class PaymentServiceImpl implements PaymentService {
     @Value("${aeroswift.xendit.secretkey}")
     private String xenditSecretkey;
 
+    @Value("${aeroswift.xendit.callback-token}")
+    private String xenditCallbackToken;
 
-    @Override
-    public PaymentResponseDTO createPaymentSession(StripeDTO stripeDto) throws StripeException {
-        Stripe.apiKey = stripeApiKey;
-        SessionCreateParams params = SessionCreateParams.builder()
-                .setMode(SessionCreateParams.Mode.PAYMENT)
-                .setSuccessUrl(CONSTANT_PAYMENT_SUCCESS_URL)
-                .setCancelUrl(CONSTANT_PAYMENT_FAILED_URL)
-                .addLineItem(
-                        SessionCreateParams.LineItem.builder()
-                                .setQuantity(1L)
-                                .setPriceData(
-                                        SessionCreateParams.LineItem.PriceData.builder()
-                                                .setCurrency(CONSTANT_CURRENCY)
-                                                .setUnitAmount((long) (stripeDto.getAmount() * 100))
-                                                .setProductData(
-                                                        SessionCreateParams.LineItem.PriceData.ProductData.builder()
-                                                                .setName("Total Amount")
-                                                                .build())
-                                                .build())
-                                .build())
-                .build();
 
-        return PaymentResponseDTO.builder()
-                .success(true)
-                .expiredPayment(null) // todo handle expired payment
-                .urlPayment(Session.create(params).getUrl())
-                .build();
-    }
+//    @Override
+//    public PaymentResponseDTO createPaymentSession(StripeDTO stripeDto) throws StripeException {
+//        Stripe.apiKey = stripeApiKey;
+//        SessionCreateParams params = SessionCreateParams.builder()
+//                .setMode(SessionCreateParams.Mode.PAYMENT)
+//                .setSuccessUrl(CONSTANT_PAYMENT_SUCCESS_URL)
+//                .setCancelUrl(CONSTANT_PAYMENT_FAILED_URL)
+//                .addLineItem(
+//                        SessionCreateParams.LineItem.builder()
+//                                .setQuantity(1L)
+//                                .setPriceData(
+//                                        SessionCreateParams.LineItem.PriceData.builder()
+//                                                .setCurrency(CONSTANT_CURRENCY)
+//                                                .setUnitAmount((long) (stripeDto.getAmount() * 100))
+//                                                .setProductData(
+//                                                        SessionCreateParams.LineItem.PriceData.ProductData.builder()
+//                                                                .setName("Total Amount")
+//                                                                .build())
+//                                                .build())
+//                                .build())
+//                .build();
+//
+//        return PaymentResponseDTO.builder()
+//                .success(true)
+//                .expiredPayment(null) // todo handle expired payment
+//                .externalId(Session.create(params).getUrl())
+//                .build();
+//    }
 
     @Override
     public Object webhook(HttpServletRequest request, HttpServletResponse response, String payload) {
@@ -154,30 +158,79 @@ public class PaymentServiceImpl implements PaymentService {
     }
 
     @Override
-    public String createPaymentXendit() {
-        Xendit.apiKey = xenditSecretkey;
-        Map<String, Object> params = new HashMap<>();
-        params.put("external_id", "my_external_id" + new Date());
-        params.put("bank_code", BankCode.BNI.getText());
-        params.put("name", "John Doe");
+    public PaymentResponseDTO createPaymentXendit() {
+        try{
 
-        FixedVirtualAccount virtualAccount = null;
-        try {
-            virtualAccount = FixedVirtualAccount.createOpen(params);
-        } catch (XenditException e) {
+            Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+            Object principal = authentication.getPrincipal();
+
+            if(principal instanceof UserDetailsImpl){
+                Optional<User> userOptional = userRepository
+                        .findByEmailAddress(((UserDetailsImpl) principal).getUsername());
+                if (userOptional.isEmpty()) {
+                    throw new UnauthorizedHandling("User Not Found");
+                }
+
+                User user = userOptional.get();
+
+                // fixed externalid > user_id
+                Xendit.apiKey = xenditSecretkey;
+                Map<String, Object> params = new HashMap<>();
+                String externalId = "fixed-va-" +  user.getUuid();
+                params.put("external_id", externalId );
+                params.put("bank_code", BankCode.BNI.getText()); // todo bank code dari user request
+                params.put("name", "John Doe");
+
+                FixedVirtualAccount virtualAccount = null;
+                try {
+                    virtualAccount = FixedVirtualAccount.createOpen(params);
+                } catch (XenditException e) {
+                    log.error(e.getMessage());
+                }
+                log.info(virtualAccount.getAccountNumber());
+                virtualAccount.setStatus("PENDING");
+
+                return PaymentResponseDTO.builder()
+                        .va(virtualAccount.getAccountNumber())
+                        .externalId(externalId)
+                        .build();
+
+            } else if (principal instanceof String) {
+                throw new UnauthorizedHandling("User not authenticated");
+            }
+
+        } catch (Exception e) {
             log.error(e.getMessage());
+            throw new ExceptionHandling(e.getMessage());
         }
-
-
-        log.info(virtualAccount.getAccountNumber());
-        virtualAccount.setStatus("PENDING");
-
-        return virtualAccount.getId();
+        throw new ExceptionHandling("Internal Server Error");
     }
 
     @Override
-    public String createVirtualAccountXenditWebhook(RequestWebhookXendit requestWebhook) {
-        return null;
+    public String createVirtualAccountXenditWebhook(String xCallbackToken,RequestWebhookXendit requestWebhook) {
+        Xendit.apiKey = xenditSecretkey;
+
+        if (!xCallbackToken.equals(xenditCallbackToken)) {
+           throw new UnauthorizedHandling("Failed Signature");
+        }
+
+        // save created va in here to booking
+        log.info("saving va to booking table");
+
+        return "success";
     }
+
+    @Override
+    public String paidXenditVirtualAccountWebhook(String xCallbackToken, RequestWebhookXendit requestWebhook) {
+        Xendit.apiKey = xenditSecretkey;
+
+        if (!xCallbackToken.equals(xenditCallbackToken)) {
+            throw new UnauthorizedHandling("Failed Signature");
+        }
+
+        // save update status paid in booking > ticket issued
+        log.info("saving va to booking table");
+
+        return "paid";    }
 
 }
