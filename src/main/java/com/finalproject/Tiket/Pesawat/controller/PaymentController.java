@@ -22,30 +22,6 @@ public class PaymentController {
     @Autowired
     private PaymentService paymentService;
 
-//    @GetMapping("/payment-session")
-//    public ResponseEntity<PaymentResponseDTO> createPaymentSession() {
-//
-//        log.info("create session");
-//        StripeDTO stripeDto = StripeDTO.builder()
-//                .amount(15000D)
-//                .build();
-//
-//        try {
-//            PaymentResponseDTO response = paymentService.createPaymentSession(stripeDto);
-//            return ResponseEntity.ok(response);
-//
-//        } catch (StripeException e) {
-//            log.error(e.getMessage());
-//            return  new ResponseEntity(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
-//        }
-//    }
-
-//    @PostMapping("/webhook")
-//    public Object webhook(HttpServletRequest request, HttpServletResponse response, @RequestBody String payload) {
-//        log.info("executing webhook...");
-//        return paymentService.webhook(request, response, payload);
-//    }
-
     @GetMapping("/success-payment")
     public ModelAndView showSuccessPage() {
         ModelAndView modelAndView = new ModelAndView();
