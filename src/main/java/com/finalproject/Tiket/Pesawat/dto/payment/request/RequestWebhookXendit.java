@@ -15,7 +15,7 @@ public class RequestWebhookXendit {
     private String id;
     private String owner_id;
     private String external_id;
-    private String merchantCode;
+    private String merchant_code;
     private String account_number;
     private String bank_code;
     private String name;

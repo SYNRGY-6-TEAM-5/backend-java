@@ -65,6 +65,7 @@ aeroswift:
     endpointSecret: whsec_be6d6552dca7e1f3012fb5409f0e75d403194ecf8aca7629c9ad3be524ce7f24
   xendit:
     secretkey: xnd_development_QdWD1ZzrgAbOT9NOWdqEZsDYQpDQF7DU2OKQ3gDe1W0FfCd5IXPtsMuNanjEMCM
+    callback-token: NNwB5azuXmFiz542b2zIgdT1XjpDqbBh47ZOqIMJl1w8ymlD
 server:
   error:
     include-binding-errors: always
