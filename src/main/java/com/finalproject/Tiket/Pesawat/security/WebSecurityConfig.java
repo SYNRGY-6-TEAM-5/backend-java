@@ -61,10 +61,6 @@ public class WebSecurityConfig {
                                 ).permitAll()
                                 .anyRequest()
                                 .authenticated())
-//                .requiresChannel(channel ->
-//                        channel
-//                                .requestMatchers(r -> r.getHeader("X-Forwarded-Proto") != null)
-//                                .requiresSecure())
                 .httpBasic(basic -> basic.authenticationEntryPoint(unauthorizedHandler))
                 .exceptionHandling(Customizer.withDefaults())
 //                .logout(httpSecurityLogoutConfigurer ->

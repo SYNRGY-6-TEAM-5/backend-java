@@ -6,6 +6,7 @@ spring:
     password: ${SPRING_DATASOURCE_PASSWORD}
     driverClassName: org.postgresql.Driver
 
+
   #spring:
   #  datasource:
   #    url: jdbc:postgresql://localhost:5432/e_flight
@@ -42,6 +43,7 @@ spring:
           google:
             client-id: 724857527525-3kehgvohkiimvhj9vj3pijois33kn1id.apps.googleusercontent.com
             client-secret: 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
+            redirect-uri: https://localhost:8080/login/oauth2/code/google
 binar:
   app:
     jwtSecret: 357638792F423F4428472B4B6250655368566D597133743677397A2443264629
