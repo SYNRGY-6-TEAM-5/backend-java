@@ -1,9 +1,9 @@
 # DB ONLINE
 spring:
   datasource:
-    url: jdbc:postgresql://aeroswiftdb.clocye2qaw3p.ap-southeast-1.rds.amazonaws.com:5432/postgres
-    username: postgres
-    password: pAy&2Ep%L98ZKq
+    url: ${SPRING_DATASOURCE_URL}
+    username: ${SPRING_DATASOURCE_USERNAME}
+    password: ${SPRING_DATASOURCE_PASSWORD}
     driverClassName: org.postgresql.Driver
 
   #spring:
@@ -65,6 +65,7 @@ aeroswift:
     endpointSecret: whsec_be6d6552dca7e1f3012fb5409f0e75d403194ecf8aca7629c9ad3be524ce7f24
   xendit:
     secretkey: xnd_development_QdWD1ZzrgAbOT9NOWdqEZsDYQpDQF7DU2OKQ3gDe1W0FfCd5IXPtsMuNanjEMCM
+    callback-token: NNwB5azuXmFiz542b2zIgdT1XjpDqbBh47ZOqIMJl1w8ymlD
 server:
   error:
     include-binding-errors: always

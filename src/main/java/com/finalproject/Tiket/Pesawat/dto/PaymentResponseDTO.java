@@ -14,6 +14,7 @@ import java.util.Date;
 @Builder
 public class PaymentResponseDTO {
     private Boolean success;
-    private String urlPayment;
+    private String va;
+    private String externalId;
     private Date expiredPayment;
 }

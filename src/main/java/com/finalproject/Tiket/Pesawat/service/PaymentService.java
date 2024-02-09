@@ -8,11 +8,13 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
 public interface PaymentService {
-    PaymentResponseDTO createPaymentSession(StripeDTO stripeDto) throws StripeException;
+//    PaymentResponseDTO createPaymentSession(StripeDTO stripeDto) throws StripeException;
 
-    Object webhook(HttpServletRequest request, HttpServletResponse response, String payload);
+//    Object webhook(HttpServletRequest request, HttpServletResponse response, String payload);
 
-    String createPaymentXendit();
+    PaymentResponseDTO createPaymentXendit();
 
-    String createVirtualAccountXenditWebhook(RequestWebhookXendit requestWebhook);
+    String createVirtualAccountXenditWebhook(String xCallbackToken,RequestWebhookXendit requestWebhook);
+
+    String paidXenditVirtualAccountWebhook(String xCallbackToken, RequestWebhookXendit requestWebhook);
 }
