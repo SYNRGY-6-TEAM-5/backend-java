@@ -90,74 +90,7 @@ public class PaymentServiceImpl implements PaymentService {
 //                .externalId(Session.create(params).getUrl())
 //                .build();
 //    }
-
-    @Override
-    public Object webhook(HttpServletRequest request, HttpServletResponse response, String payload) {
-
-        try {
-            Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-            Object principal = authentication.getPrincipal();
-
-            if (principal instanceof UserDetailsImpl) {
-                UserDetailsImpl userDetails = (UserDetailsImpl) principal;
-
-                Optional<User> userOptional = userRepository.findByEmailAddress(userDetails.getUsername());
-
-                if (userOptional.isEmpty()) {
-                    throw new ExceptionHandling("User Not Found");
-                }
-
-                String endpointSecret = stripeEndpointSecret;
-                Stripe.apiKey = stripeApiKey;
-                String sigHeader = request.getHeader(STRIPE_HEADER_REQEUST);
-
-                Event event; // init
-
-                try {
-                    event = Webhook.constructEvent(payload, sigHeader, endpointSecret);
-                } catch (SignatureVerificationException e) {
-                    response.setStatus(400);
-                    return "Failed Signature";
-                }
-
-                if (STRIPE_SESSION_COPMLETED.equals(event.getType())) {
-                    // success
-                    EventDataObjectDeserializer dataObjectDeserializer = event.getDataObjectDeserializer();
-                    if (dataObjectDeserializer.getObject().isPresent()) {
-                        Session session = (Session) dataObjectDeserializer.getObject().get();
-
-                        Booking booking = Booking.builder()
-                                .user(userOptional.get())
-                                .status(CONSTANT_PAYMENT_STATUS_SUCCESS)
-                                .build();
-                        bookingRepository.save(booking);
-                        log.info("Payment succeeded : " +
-                                session.getCustomerDetails().getName() + " : " + session.getAmountTotal() / 100);
-                    }
-
-                } else {
-                    // failed
-                    Booking booking = Booking.builder()
-                            .user(userOptional.get())
-                            .status(CONSTANT_PAYMENT_STATUS_FAILED)
-                            .build();
-                    bookingRepository.save(booking);
-                    response.setStatus(400);
-                    return "";
-                }
-
-            } else if (principal instanceof String) {
-                throw new UnauthorizedHandling("User not authenticated");
-            }
-        } catch (Exception e) {
-            log.error(e.getMessage());
-            throw new ExceptionHandling(e.getMessage());
-        }
-        response.setStatus(200);
-        return "";
-    }
-
-    @Override
+        @Override
     public PaymentResponseDTO createPaymentXendit() {
         try{
 
