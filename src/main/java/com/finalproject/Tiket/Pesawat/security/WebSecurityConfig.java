@@ -60,6 +60,7 @@ public class WebSecurityConfig {
                                         "api/v1/server/**"
                                 ).permitAll()
                                 .requestMatchers("api/v1/payment/xendit-payment/webhook-create",
+                                        "api/v1/payment/simulate_payment", "api/v1/payment/xendit/support-payment",
                                         "api/v1/payment/xendit-payment/webhook-paid").permitAll()
                                 .anyRequest()
                                 .authenticated())

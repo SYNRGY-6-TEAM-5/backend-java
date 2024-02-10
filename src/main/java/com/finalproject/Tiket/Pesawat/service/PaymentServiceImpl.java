@@ -3,6 +3,8 @@ package com.finalproject.Tiket.Pesawat.service;
 import com.finalproject.Tiket.Pesawat.dto.PaymentResponseDTO;
 import com.finalproject.Tiket.Pesawat.dto.payment.request.CreateVaPaymentRequest;
 import com.finalproject.Tiket.Pesawat.dto.payment.request.RequestWebhookXendit;
+import com.finalproject.Tiket.Pesawat.dto.payment.request.RequestWebhookXenditPaid;
+import com.finalproject.Tiket.Pesawat.dto.payment.response.SupportPaymentResponse;
 import com.finalproject.Tiket.Pesawat.exception.ExceptionHandling;
 import com.finalproject.Tiket.Pesawat.exception.UnauthorizedHandling;
 import com.finalproject.Tiket.Pesawat.model.Booking;
@@ -12,21 +14,26 @@ import com.finalproject.Tiket.Pesawat.repository.UserRepository;
 import com.finalproject.Tiket.Pesawat.security.service.UserDetailsImpl;
 import com.finalproject.Tiket.Pesawat.utils.Utils;
 import com.xendit.Xendit;
+import com.xendit.enums.BankCode;
 import com.xendit.exception.XenditException;
+import com.xendit.model.FixedPaymentCode;
 import com.xendit.model.FixedVirtualAccount;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.*;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.HttpClientErrorException;
+import org.springframework.web.client.RestTemplate;
 
 import java.text.SimpleDateFormat;
 import java.time.Instant;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Optional;
-import java.util.TimeZone;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
+import java.util.*;
+import java.util.stream.Collectors;
 
 import static com.finalproject.Tiket.Pesawat.utils.Constants.CONSTANT_PAYMENT_STATUS_SUCCESS;
 
@@ -47,6 +54,12 @@ public class PaymentServiceImpl implements PaymentService {
     @Value("${aeroswift.xendit.callback-token}")
     private String xenditCallbackToken;
 
+    @Value("${aeroswift.xendit.baseUrl}")
+    private String xenditApiBaseUrl;
+
+    @Value("${aeroswift.xendit.username}")
+    private String username;
+
     @Override
     public PaymentResponseDTO createPaymentXendit(CreateVaPaymentRequest request) {
         try {
@@ -57,6 +70,7 @@ public class PaymentServiceImpl implements PaymentService {
             if (principal instanceof UserDetailsImpl) {
                 Optional<User> userOptional = userRepository
                         .findByEmailAddress(((UserDetailsImpl) principal).getUsername());
+
                 if (userOptional.isEmpty()) {
                     throw new UnauthorizedHandling("User Not Found");
                 }
@@ -66,23 +80,26 @@ public class PaymentServiceImpl implements PaymentService {
                 }
 
                 Optional<Booking> bookingOptional = bookingRepository.findById(request.getBookingId());
+
                 if (bookingOptional.isEmpty()) {
                     throw new ExceptionHandling("Booking Not Found");
                 }
 
+                if (bookingOptional.get().getBookingCode() != null) {
+                    throw new ExceptionHandling("Booking code not generated. This booking with the specified ID has already been generated previously.");
+                }
+
                 Booking booking = bookingOptional.get();
                 User user = userOptional.get();
-                // todo check apakah memang booking id mempunyai relasi dengan user
-//                if (!booking.getUser().getUuid().equals(user.getUuid())){
-//                    throw new ExceptionHandling("User does not have a booking");
-//                }
+                if (!booking.getUser().getUuid().equals(user.getUuid())){
+                    throw new ExceptionHandling("User does not have a booking");
+                }
                 String externalId = "external_id_" + Instant.now().getEpochSecond() + "_" + user.getUuid();
 
                 TimeZone gmtMinus7TimeZone = TimeZone.getTimeZone("GMT+0");
                 SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
                 dateFormat.setTimeZone(gmtMinus7TimeZone);
                 String formattedExpirationDateGMTMinus7 = dateFormat.format(booking.getExpiredTime());
-                log.info(formattedExpirationDateGMTMinus7 + "GMT +7" + booking.getExpiredTime());
 
                 Map<String, Object> params = new HashMap<>();
                 params.put("external_id", externalId);
@@ -90,7 +107,7 @@ public class PaymentServiceImpl implements PaymentService {
                 params.put("name", user.getFullname());
                 params.put("expected_amount", booking.getTotalAmount());
                 params.put("is_single_use", true);
-                params.put("expiration_date", booking.getExpiredTime());
+                params.put("expiration_date", formattedExpirationDateGMTMinus7);
 
                 FixedVirtualAccount virtualAccount;
                 try {
@@ -148,7 +165,7 @@ public class PaymentServiceImpl implements PaymentService {
 
 
     @Override
-    public String paidXenditVirtualAccountWebhook(String xCallbackToken, RequestWebhookXendit requestWebhook) {
+    public String paidXenditVirtualAccountWebhook(String xCallbackToken, RequestWebhookXenditPaid requestWebhook) {
         Xendit.apiKey = xenditSecretkey;
 
         if (!xCallbackToken.equals(xenditCallbackToken)) {
@@ -161,12 +178,70 @@ public class PaymentServiceImpl implements PaymentService {
         if (bookingOptional.isPresent()) {
             Booking booking = bookingOptional.get();
             booking.setStatus(CONSTANT_PAYMENT_STATUS_SUCCESS);
+            booking.setPaymentId(requestWebhook.getPayment_id());
+
+            // Convert transaction_timestamp to GMT+7
+            Instant instant = requestWebhook.getTransaction_timestamp().toInstant();
+            ZoneId zoneId = ZoneId.of("GMT+7");
+            ZonedDateTime gmtPlus7 = ZonedDateTime.ofInstant(instant, zoneId);
+            booking.setUpdatedAt(Date.from(gmtPlus7.toInstant()));
+
             bookingRepository.save(booking);
             log.info("saving va to booking table");
             return "success";
         } else {
             log.error("failed ");
             return "failed booking not found for external_id";
+        }
+    }
+
+    @Override
+    public SupportPaymentResponse getSupportPayment() {
+        List<String> bankCodes = Arrays.stream(BankCode.values())
+                .map(BankCode::getText)
+                .collect(Collectors.toList());
+
+        List<String> retailOutletNames = Arrays.stream(FixedPaymentCode.RetailOutletName.values())
+                .map(Enum::name)
+                .collect(Collectors.toList());
+
+        return SupportPaymentResponse.builder()
+                .banks(bankCodes)
+                .retails(retailOutletNames)
+                .build();
+    }
+
+    @Override
+    public ResponseEntity<Object> simulatePayment(String amount, String externalId) {
+        String requestBody = "{\"amount\":" + amount + "}";
+        String apiUrl = xenditApiBaseUrl + "external_id=" + externalId + "/simulate_payment";
+        RestTemplate restTemplate = new RestTemplate();
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.setBasicAuth(username, "");
+        headers.setContentType(MediaType.APPLICATION_JSON);
+
+        HttpEntity<String> requestEntity = new HttpEntity<>(requestBody, headers);
+
+        try {
+            ResponseEntity<String> responseEntity = restTemplate.exchange(
+                    apiUrl, HttpMethod.POST, requestEntity, String.class);
+
+            return ResponseEntity.ok(responseEntity.getBody());
+        } catch (HttpClientErrorException.BadRequest e) {
+            String errorMessage = extractErrorMessage(e);
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorMessage);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error occurred");
+        }
+    }
+
+    private String extractErrorMessage(HttpClientErrorException.BadRequest e) {
+        try {
+            return e.getResponseBodyAsString();
+        } catch (Exception ex) {
+            return "Bad Request: " + e.getMessage();
         }
     }
 
