@@ -3,6 +3,7 @@ package com.finalproject.Tiket.Pesawat.service;
 import com.finalproject.Tiket.Pesawat.dto.SuccesMessageDTO;
 import com.finalproject.Tiket.Pesawat.dto.user.request.DeleteUserRequest;
 import com.finalproject.Tiket.Pesawat.dto.user.request.UpdateProfileRequest;
+import com.finalproject.Tiket.Pesawat.dto.user.request.UpdateUserFcmTokenRequest;
 import com.finalproject.Tiket.Pesawat.dto.user.request.UploadImageRequest;
 import com.finalproject.Tiket.Pesawat.dto.user.response.UpdateProfileResponse;
 import com.finalproject.Tiket.Pesawat.dto.user.response.UploadFileResponse;
@@ -253,6 +254,36 @@ public class UserServiceImpl implements UserService {
                 .success(true)
                 .message("success delete user")
                 .build();
+    }
+
+    @Override
+    public SuccesMessageDTO setFcmToken(UpdateUserFcmTokenRequest userFcmTokenRequest) {
+        try {
+            Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+            Object principal = authentication.getPrincipal();
+
+            if (!(principal instanceof UserDetailsImpl)) {
+                throw new UnauthorizedHandling("User not authenticated");
+            }
+
+            UserDetailsImpl userDetails = (UserDetailsImpl) principal;
+            Optional<User> userOptional = userRepository.findByEmailAddress(userDetails.getUsername());
+
+            if (userOptional.isEmpty()) {
+                throw new UnauthorizedHandling("User Not Found");
+            }
+
+            User user = userOptional.get();
+            user.setFcmToken(userFcmTokenRequest.getFcmToken());
+            userRepository.save(user);
+            return SuccesMessageDTO.builder()
+                    .success(true)
+                    .message("success save fcm token")
+                    .build();
+        } catch (Exception e) {
+            log.error(e.getMessage(), e);
+            throw new ExceptionHandling(e.getMessage());
+        }
     }
 
 
