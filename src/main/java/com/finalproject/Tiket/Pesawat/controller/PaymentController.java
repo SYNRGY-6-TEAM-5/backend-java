@@ -1,8 +1,8 @@
 package com.finalproject.Tiket.Pesawat.controller;
 
 import com.finalproject.Tiket.Pesawat.dto.PaymentResponseDTO;
-import com.finalproject.Tiket.Pesawat.dto.payment.request.RequestWebhookXendit;
 import com.finalproject.Tiket.Pesawat.dto.payment.request.CreateVaPaymentRequest;
+import com.finalproject.Tiket.Pesawat.dto.payment.request.RequestWebhookXendit;
 import com.finalproject.Tiket.Pesawat.dto.payment.response.SupportPaymentResponse;
 import com.finalproject.Tiket.Pesawat.service.PaymentService;
 import com.xendit.enums.BankCode;
@@ -10,13 +10,12 @@ import com.xendit.model.FixedPaymentCode;
 import jakarta.validation.Valid;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.*;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.servlet.ModelAndView;
-import org.springframework.http.MediaType;
-
 
 import java.util.Arrays;
 import java.util.List;
@@ -46,9 +45,10 @@ public class PaymentController {
         return modelAndView;
     }
 
+    @Value("${aeroswift.xendit.username}")
+    private String username;
 
     // todo buat retailnya juga ( 2 ENDPOINT)
-    // request body { booking id }
     @PostMapping("/xendit-payment/create-va")
     public ResponseEntity<PaymentResponseDTO> paymentXendit(@Valid @RequestBody CreateVaPaymentRequest request) {
         PaymentResponseDTO response = paymentService.createPaymentXendit(request);
@@ -101,7 +101,7 @@ public class PaymentController {
         RestTemplate restTemplate = new RestTemplate();
 
         HttpHeaders headers = new HttpHeaders();
-        headers.setBasicAuth("xnd_development_QdWD1ZzrgAbOT9NOWdqEZsDYQpDQF7DU2OKQ3gDe1W0FfCd5IXPtsMuNanjEMCM", "");
+        headers.setBasicAuth(username, "");
         headers.setContentType(MediaType.APPLICATION_JSON);
 
         HttpEntity<String> requestEntity = new HttpEntity<>(requestBody, headers);

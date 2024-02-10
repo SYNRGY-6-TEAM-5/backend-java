@@ -42,7 +42,7 @@ spring:
           google:
             client-id: 724857527525-3kehgvohkiimvhj9vj3pijois33kn1id.apps.googleusercontent.com
             client-secret: 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
-            redirect-uri: https://backend-java-production-ece2.up.railway.app/login/oauth2/code/google
+#            redirect-uri: https://backend-java-production-ece2.up.railway.app/login/oauth2/code/google
 binar:
   app:
     jwtSecret: 357638792F423F4428472B4B6250655368566D597133743677397A2443264629
@@ -60,12 +60,13 @@ springdoc:
 aeroswift:
   openapi:
     dev-url: https://backend-java-production-ece2.up.railway.app
-  stripe:
-    apikey: sk_test_51OhAu5JzTxH2i8XQcwq7Kir0CnJuSX39GndWEet2l9BoQBCfLq2cVYmG6lpUA768d49ARAdjlVJSFynFGChdaNXv00FZdBUQN5
-    endpointSecret: whsec_be6d6552dca7e1f3012fb5409f0e75d403194ecf8aca7629c9ad3be524ce7f24
   xendit:
-    secretkey: xnd_development_QdWD1ZzrgAbOT9NOWdqEZsDYQpDQF7DU2OKQ3gDe1W0FfCd5IXPtsMuNanjEMCM
+    secretkey: xnd_development_Vkao205cl1nmfJD8HsRUITWz2RL4OvMx27UhhKzevhvsOdxzFdfNyihtYnY5pyo
     callback-token: NNwB5azuXmFiz542b2zIgdT1XjpDqbBh47ZOqIMJl1w8ymlD
+    username: xnd_development_QdWD1ZzrgAbOT9NOWdqEZsDYQpDQF7DU2OKQ3gDe1W0FfCd5IXPtsMuNanjEMCM
+  frontend:
+    url: https://staging-aero-swift.netlify.app/
+#    url: http://localhost:3000
 server:
   error:
     include-binding-errors: always

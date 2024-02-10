@@ -124,15 +124,4 @@ public class AuthController {
         return ResponseEntity.ok(response);
     }
 
-
-    // OAUTH2
-    // todo handle success or error
-//    @GetMapping("/user")
-//    public Map<String, Object> userOauth2() {
-//        Map<String, Object> response = new HashMap<>();
-//
-//        response.put("message", "success register with oauth2");
-//        return response;
-//    }
-
 }

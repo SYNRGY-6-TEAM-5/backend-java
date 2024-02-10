@@ -108,6 +108,15 @@ public class OTPServiceImpl implements OTPService {
 
 
     public OTPValidationResponse validateOTPForgotPassword(OTPValidationRequest validationRequest) {
+
+        if (validationRequest.getEmail().equals(CONSTANT_EMAIL_TEST_FORGOT)) {
+            return OTPValidationResponse.builder()
+                    .status(true)
+                    .message("Success Validate OTP")
+                    .token(jwtUtils.generateDummyToken())
+                    .build();
+        }
+
         Optional<OtpForgotPassword> otpInfoOptional = otpForgotPasswordRepository.findByEmailUser(validationRequest.getEmail());
         OTPValidationResponse response = new OTPValidationResponse();
 
@@ -128,13 +137,6 @@ public class OTPServiceImpl implements OTPService {
                 && otpForgotPassword.getOtp().equals(validationRequest.getOtp())) {
             otpForgotPasswordRepository.delete(otpForgotPassword);
 
-            if (otpForgotPassword.getEmailUser().equals(CONSTANT_EMAIL_TEST_FORGOT)) {
-                return OTPValidationResponse.builder()
-                        .status(true)
-                        .message("Success Validate OTP")
-                        .token(jwtUtils.generateDummyToken())
-                        .build();
-            }
 
             Optional<User> newUserPw = userRepository.findByEmailAddress(validationRequest.getEmail());
             if (newUserPw.isEmpty()) {

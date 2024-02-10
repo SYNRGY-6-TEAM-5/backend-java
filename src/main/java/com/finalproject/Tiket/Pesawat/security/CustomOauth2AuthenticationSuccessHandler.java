@@ -1,11 +1,10 @@
 package com.finalproject.Tiket.Pesawat.security;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
+import com.finalproject.Tiket.Pesawat.exception.ExceptionHandling;
 import com.finalproject.Tiket.Pesawat.model.EnumRole;
 import com.finalproject.Tiket.Pesawat.model.Images;
 import com.finalproject.Tiket.Pesawat.model.Role;
 import com.finalproject.Tiket.Pesawat.model.User;
-import com.finalproject.Tiket.Pesawat.payload.response.JwtResponse;
 import com.finalproject.Tiket.Pesawat.repository.RoleRepository;
 import com.finalproject.Tiket.Pesawat.repository.UserRepository;
 import com.finalproject.Tiket.Pesawat.security.jwt.JwtUtils;
@@ -17,23 +16,22 @@ import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.oauth2.client.authentication.OAuth2AuthenticationToken;
+import org.springframework.security.oauth2.core.user.DefaultOAuth2User;
 import org.springframework.security.oauth2.core.user.OAuth2User;
-import org.springframework.security.web.authentication.SimpleUrlAuthenticationSuccessHandler;
+import org.springframework.security.web.authentication.SavedRequestAwareAuthenticationSuccessHandler;
+import org.springframework.stereotype.Component;
 
 import java.io.IOException;
-import java.util.Collection;
-import java.util.stream.Collectors;
+import java.util.Map;
 
-@Configuration
+@Component
 @Log4j2
-public class CustomOauth2AuthenticationSuccessHandler extends SimpleUrlAuthenticationSuccessHandler {
+public class CustomOauth2AuthenticationSuccessHandler extends SavedRequestAwareAuthenticationSuccessHandler {
 
     @Autowired
     private JwtUtils jwtUtils;
@@ -44,8 +42,8 @@ public class CustomOauth2AuthenticationSuccessHandler extends SimpleUrlAuthentic
     @Autowired
     private RoleRepository roleRepository;
 
-//    @Value("${frontend.url}")
-//    private String frontendUrl;
+    @Value("${aeroswift.frontend.url}")
+    private String frontendUrl;
 
     @Override
     public void onAuthenticationSuccess(
@@ -53,21 +51,37 @@ public class CustomOauth2AuthenticationSuccessHandler extends SimpleUrlAuthentic
             HttpServletResponse response,
             Authentication authentication) throws IOException, ServletException {
 
-        if (authentication instanceof OAuth2AuthenticationToken) {
-            OAuth2User oauth2User = ((OAuth2AuthenticationToken) authentication).getPrincipal();
+        OAuth2AuthenticationToken oAuth2AuthenticationToken = (OAuth2AuthenticationToken) authentication;
+        log.info(oAuth2AuthenticationToken.getAuthorizedClientRegistrationId());
 
-            User user = userRepository.findByEmailAddress(oauth2User.getAttribute("email").toString()).orElse(null);
+        if ("google".equals(oAuth2AuthenticationToken.getAuthorizedClientRegistrationId())) {
+            DefaultOAuth2User principal = (DefaultOAuth2User) authentication.getPrincipal();
+            Map<String, Object> attributes = principal.getAttributes();
+            log.info(attributes);
+            String email = attributes.get("email").toString();
 
-            if (user != null) {
-                handleExistingUser(user, oauth2User, response, request);
-            } else {
-                handleNewUser(oauth2User, response, request);
-            }
-        } else {
-            response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+            userRepository.findByEmailAddress(email)
+                    .ifPresentOrElse(user -> {
+                                try {
+                                    log.info("handle existing user");
+                                    handleExistingUser(user, principal, response, request);
+                                } catch (IOException e) {
+                                    log.error(e.getMessage());
+                                    throw new ExceptionHandling(e.getMessage());
+                                }
+                            },
+                            () -> {
+                                try {
+                                    handleNewUser(principal, response, request);
+                                } catch (IOException e) {
+                                    log.error(e.getMessage());
+                                    throw new RuntimeException(e);
+                                }
+                            });
         }
+
         this.setAlwaysUseDefaultTargetUrl(true);
-        this.setDefaultTargetUrl("http://localhost:3000");
+        this.setDefaultTargetUrl(frontendUrl);
         super.onAuthenticationSuccess(request, response, authentication);
     }
 
@@ -75,9 +89,6 @@ public class CustomOauth2AuthenticationSuccessHandler extends SimpleUrlAuthentic
         UserDetails userDetails = UserDetailsImpl.build(user);
         Authentication auth = new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
         SecurityContextHolder.getContext().setAuthentication(auth);
-        String token = jwtUtils.generateToken(auth);
-        log.info(oauth2User.toString());
-        sendJwtResponse(oauth2User.getAttribute("email").toString(), token, userDetails.getAuthorities(), response, request);
     }
 
     private void handleNewUser(OAuth2User oauth2User, HttpServletResponse response, HttpServletRequest request) throws IOException {
@@ -107,30 +118,5 @@ public class CustomOauth2AuthenticationSuccessHandler extends SimpleUrlAuthentic
         UserDetails userDetails = UserDetailsImpl.build(newUser);
         Authentication auth = new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
         SecurityContextHolder.getContext().setAuthentication(auth);
-        String token = jwtUtils.generateToken(auth);
-        log.info(oauth2User.toString());
-        sendJwtResponse(email, token, userDetails.getAuthorities(), response, request);
-    }
-
-    private void sendJwtResponse(String email, String token, Collection<? extends GrantedAuthority> authorities, HttpServletResponse response, HttpServletRequest request) throws IOException {
-        JwtResponse jwtResponse = JwtResponse.builder()
-                .token(token)
-                .email(email)
-                .type("Bearer")
-                .roles(authorities.stream()
-                        .map(item -> item.getAuthority())
-                        .collect(Collectors.toList()))
-                .build();
-
-        ObjectMapper objectMapper = new ObjectMapper();
-        String jsonResponse = objectMapper.writeValueAsString(jwtResponse);
-
-        response.setContentType("application/json");
-        response.getWriter().write(jsonResponse);
-        response.getWriter().flush();
-        String redirectUrl = request.getRequestURL().toString().replace("http:", "https:");
-
-        response.sendRedirect(redirectUrl);
-        log.info(jsonResponse);
     }
 }

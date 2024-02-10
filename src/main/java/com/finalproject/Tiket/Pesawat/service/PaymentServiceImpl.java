@@ -12,7 +12,6 @@ import com.finalproject.Tiket.Pesawat.repository.UserRepository;
 import com.finalproject.Tiket.Pesawat.security.service.UserDetailsImpl;
 import com.finalproject.Tiket.Pesawat.utils.Utils;
 import com.xendit.Xendit;
-import com.xendit.enums.BankCode;
 import com.xendit.exception.XenditException;
 import com.xendit.model.FixedVirtualAccount;
 import lombok.extern.slf4j.Slf4j;
@@ -24,10 +23,12 @@ import org.springframework.stereotype.Service;
 
 import java.text.SimpleDateFormat;
 import java.time.Instant;
-import java.util.*;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Optional;
+import java.util.TimeZone;
 
-import static com.finalproject.Tiket.Pesawat.utils.Constants.PAYMENT_EXPIRED_TIME;
-import static org.bouncycastle.asn1.ua.DSTU4145NamedCurves.params;
+import static com.finalproject.Tiket.Pesawat.utils.Constants.CONSTANT_PAYMENT_STATUS_SUCCESS;
 
 
 @Service
@@ -60,11 +61,10 @@ public class PaymentServiceImpl implements PaymentService {
                     throw new UnauthorizedHandling("User Not Found");
                 }
 
-                if (userOptional.get().getFullname() == null){
+                if (userOptional.get().getFullname() == null) {
                     throw new UnauthorizedHandling("User has not set their full name in the profile");
                 }
 
-                // find booking
                 Optional<Booking> bookingOptional = bookingRepository.findById(request.getBookingId());
                 if (bookingOptional.isEmpty()) {
                     throw new ExceptionHandling("Booking Not Found");
@@ -81,9 +81,8 @@ public class PaymentServiceImpl implements PaymentService {
                 TimeZone gmtMinus7TimeZone = TimeZone.getTimeZone("GMT+0");
                 SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
                 dateFormat.setTimeZone(gmtMinus7TimeZone);
-                Date expiredPayment = new Date(System.currentTimeMillis() + PAYMENT_EXPIRED_TIME);
-                String formattedExpirationDateGMTMinus7 = dateFormat.format(expiredPayment);
-                log.info(formattedExpirationDateGMTMinus7 + "GMT +7" + expiredPayment);
+                String formattedExpirationDateGMTMinus7 = dateFormat.format(booking.getExpiredTime());
+                log.info(formattedExpirationDateGMTMinus7 + "GMT +7" + booking.getExpiredTime());
 
                 Map<String, Object> params = new HashMap<>();
                 params.put("external_id", externalId);
@@ -91,26 +90,25 @@ public class PaymentServiceImpl implements PaymentService {
                 params.put("name", user.getFullname());
                 params.put("expected_amount", booking.getTotalAmount());
                 params.put("is_single_use", true);
-                params.put("expiration_date", formattedExpirationDateGMTMinus7);
+                params.put("expiration_date", booking.getExpiredTime());
 
                 FixedVirtualAccount virtualAccount;
                 try {
+                    log.info("create va " + user.getUuid().toString());
                     virtualAccount = FixedVirtualAccount.createClosed(params);
                 } catch (XenditException e) {
                     log.error(e.getMessage());
                     throw new ExceptionHandling(e.getMessage());
                 }
 
-                booking.setExpiredTime(expiredPayment);
                 booking.setExternalId(externalId);
-                booking.setUpdatedAt(Utils.getCurrentDateTimeAsDate());
                 bookingRepository.save(booking);
 
                 return PaymentResponseDTO.builder()
                         .success(true)
                         .va(virtualAccount.getAccountNumber())
                         .externalId(externalId)
-                        .expiredPayment(expiredPayment)
+                        .expiredPayment(booking.getExpiredTime())
                         .build();
 
             } else if (principal instanceof String) {
@@ -132,10 +130,22 @@ public class PaymentServiceImpl implements PaymentService {
             throw new UnauthorizedHandling("Failed Signature");
         }
 
-        log.info("saving va to booking table");
+        Optional<Booking> bookingOptional = bookingRepository.findByExternalId(requestWebhook.getExternal_id());
 
-        return "success";
+        if (bookingOptional.isPresent()) {
+            Booking booking = bookingOptional.get();
+            booking.setPaymentMethod(requestWebhook.getBank_code());
+            booking.setBookingCode(Utils.generateBookingCode(booking.getBookingId(), booking.getUser().getUuid().toString()));
+            booking.setUpdatedAt(Utils.getCurrentDateTimeAsDate());
+            bookingRepository.save(booking);
+            log.info("success create va");
+            return "success";
+        } else {
+            log.error("failed ");
+            return "failed booking not found for external_id";
+        }
     }
+
 
     @Override
     public String paidXenditVirtualAccountWebhook(String xCallbackToken, RequestWebhookXendit requestWebhook) {
@@ -145,10 +155,19 @@ public class PaymentServiceImpl implements PaymentService {
             throw new UnauthorizedHandling("Failed Signature");
         }
 
-        // save update status paid in booking > ticket issued
-        log.info("saving va to booking table");
+        // todo issued ticket
+        Optional<Booking> bookingOptional = bookingRepository.findByExternalId(requestWebhook.getExternal_id());
 
-        return "paid";
+        if (bookingOptional.isPresent()) {
+            Booking booking = bookingOptional.get();
+            booking.setStatus(CONSTANT_PAYMENT_STATUS_SUCCESS);
+            bookingRepository.save(booking);
+            log.info("saving va to booking table");
+            return "success";
+        } else {
+            log.error("failed ");
+            return "failed booking not found for external_id";
+        }
     }
 
 }
