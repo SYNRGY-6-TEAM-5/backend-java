@@ -46,6 +46,9 @@ public class User {
     @Column(name = "phone_num")
     private Long phoneNumber;
 
+    @Column(name = "fcm_token")
+    private String fcmToken;
+
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "role_id")
     private Role role;
