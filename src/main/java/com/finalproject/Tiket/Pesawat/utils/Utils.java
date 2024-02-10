@@ -30,4 +30,9 @@ public class Utils {
         String[] parts = cloudinaryUrl.split("/");
         return parts[parts.length - 2];
     }
+
+    public static String generateBookingCode(long bookingId, String userId) {
+        String userIdPrefix = userId.substring(0, 5);
+        return "AERSWFT" + bookingId + userIdPrefix;
+    }
 }
