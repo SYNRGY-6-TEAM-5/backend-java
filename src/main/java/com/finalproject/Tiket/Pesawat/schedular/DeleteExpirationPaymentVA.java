@@ -21,22 +21,22 @@ public class DeleteExpirationPaymentVA {
     @Autowired
     private BookingRepository bookingRepository;
 
-//    @Scheduled(fixedRate = 60000) // berjalan setiap 60 detik
-//    public void updatePaymentStatusVAExpired() {
-//        List<Booking> pendingExpiredBookings = bookingRepository.findAllByExpiredTimeBeforeAndStatus(new Date(),
-//                CONSTANT_PAYMENT_STATUS_PENDING);
-//        if (!pendingExpiredBookings.isEmpty()) {
-//            updateBookingStatus(pendingExpiredBookings);
-//        }
-//    }
+    @Scheduled(fixedRate = 60000) // berjalan setiap 60 detik
+    public void updatePaymentStatusVAExpired() {
+        List<Booking> pendingExpiredBookings = bookingRepository.findAllByExpiredTimeBeforeAndStatus(new Date(),
+                CONSTANT_PAYMENT_STATUS_PENDING);
+        if (!pendingExpiredBookings.isEmpty()) {
+            updateBookingStatus(pendingExpiredBookings);
+        }
+    }
+
 
     private void updateBookingStatus(List<Booking> bookings) {
         List<Booking> updatedBookings = bookings.stream()
                 .peek(booking -> booking.setStatus(CONSTANT_PAYMENT_STATUS_FAILED))
                 .collect(Collectors.toList());
-
-        bookingRepository.saveAll(updatedBookings);
         log.info("Berhasil memperbarui status menjadi GAGAL untuk scheduler VA yang kadaluarsa");
+        bookingRepository.saveAll(updatedBookings);
     }
 
 }
