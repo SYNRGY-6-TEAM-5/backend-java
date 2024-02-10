@@ -32,7 +32,9 @@ public class Utils {
     }
 
     public static String generateBookingCode(long bookingId, String userId) {
-        String userIdPrefix = userId.substring(0, 5);
-        return "AERSWFT" + bookingId + userIdPrefix;
+        String userIdPrefix = userId.substring(0, Math.min(5, userId.length()));
+        String bookingCode = "AERSWFT" + bookingId + userIdPrefix;
+        return bookingCode.toUpperCase();
     }
+
 }
