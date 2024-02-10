@@ -18,6 +18,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.stereotype.Service;
 
 import java.util.Date;
@@ -62,7 +63,25 @@ public class BookingServiceImpl implements BookingService {
                 }
 
                 return booking;
-            } else if (principal instanceof String) {
+            }
+            else if (principal instanceof OAuth2User) {
+                log.info("oauth2 user bos" + ((OAuth2User) principal).getName() + ((OAuth2User) principal).getAttributes());
+                Optional<User> userOptional = userRepository.findByEmailAddress(((OAuth2User) principal).getName());
+
+                if (userOptional.isEmpty()) {
+                    throw new UnauthorizedHandling("User Not Found");
+                }
+
+                User user = userOptional.get();
+                List<Booking> booking = bookingRepository.findAllByUser(user);
+
+                if (booking.isEmpty()) {
+                    throw new ExceptionHandling("Empty Bookings");
+                }
+
+                return booking;
+            }
+            else if (principal instanceof String) {
                 throw new UnauthorizedHandling("User not authenticated");
             }
 
@@ -88,10 +107,12 @@ public class BookingServiceImpl implements BookingService {
                 if (userOptional.isEmpty()) {
                     throw new UnauthorizedHandling("User Not Found");
                 }
+
+
                 bookingUser = Booking.builder()
                         .totalPassenger(userRequestBooking.getTotal_passenger())
-                        .expiredTime(new Date(System.currentTimeMillis() + PAYMENT_EXPIRED_TIME))
                         .totalAmount(userRequestBooking.getTotal_amount())
+                        .expiredTime(new Date(System.currentTimeMillis() + PAYMENT_EXPIRED_TIME))
                         .fullProtection(userRequestBooking.getFull_protection())
                         .bagInsurance(userRequestBooking.getBag_insurance())
                         .status(CONSTANT_PAYMENT_STATUS_PENDING)

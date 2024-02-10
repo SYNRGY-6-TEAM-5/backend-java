@@ -1,13 +1,12 @@
 package com.finalproject.Tiket.Pesawat.security;
 
 
-import com.finalproject.Tiket.Pesawat.repository.RoleRepository;
 import com.finalproject.Tiket.Pesawat.security.jwt.AuthEntryPointJwt;
 import com.finalproject.Tiket.Pesawat.security.jwt.AuthTokenFilter;
 import com.finalproject.Tiket.Pesawat.security.service.UserDetailServiceImpl;
-import com.finalproject.Tiket.Pesawat.service.UserService;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -18,12 +17,15 @@ import org.springframework.security.config.annotation.method.configuration.Enabl
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
-import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
-import org.springframework.security.web.savedrequest.HttpSessionRequestCache;
+import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.cors.CorsConfigurationSource;
+import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
+
+import java.util.List;
 
 @Configuration
 @EnableMethodSecurity
@@ -40,35 +42,30 @@ public class WebSecurityConfig {
     @Autowired
     private CustomOauth2AuthenticationSuccessHandler customOAuth2AuthenticationSuccessHandler;
 
-    @Bean
-    protected SecurityFilterChain filterChain(HttpSecurity http) throws Exception { //handle throw failed login
-        HttpSessionRequestCache myReqeustCache = new HttpSessionRequestCache();
-        myReqeustCache.setMatchingRequestParameterName(null);
-        myReqeustCache.setCreateSessionAllowed(false);
+    @Value("${aeroswift.frontend.url}")
+    private String frontendUrl;
 
+    @Bean
+    protected SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
 
         http
-                .securityContext(context -> context.requireExplicitSave(false))
-                .requestCache((cache) -> cache.requestCache(myReqeustCache))
                 .csrf(AbstractHttpConfigurer::disable)
+                .cors(cors -> cors.configurationSource(corsConfigurationSource()))
                 .authorizeHttpRequests(auth ->
                         auth
                                 .requestMatchers("/login/**", "/error/**",
                                         "swagger-ui/**", "/swagger-resources/**", "/swagger-resources",
                                         "/webjars/**", "/v3/api-docs/**", "/configuration/ui", "api/v1/auth/**"
                                         , "api/v1/airport/**", "api/v1/arrival/**", "api/v1/departure/**",
-                                        "api/v1/payment/**", "api/v1/server/**" // todo harus mengubah payment agar auth
+                                        "api/v1/server/**"
                                 ).permitAll()
                                 .anyRequest()
                                 .authenticated())
                 .httpBasic(basic -> basic.authenticationEntryPoint(unauthorizedHandler))
                 .exceptionHandling(Customizer.withDefaults())
-//                .logout(httpSecurityLogoutConfigurer ->
-//                        httpSecurityLogoutConfigurer.logoutUrl("/api/v1/auth/logout")
-//                                .addLogoutHandler(LogoutService)
-//                                .logoutSuccessHandler(new HttpStatusReturningLogoutSuccessHandler(HttpStatus.OK)).permitAll())
-                .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+//                .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .oauth2Login(oauth -> {
+                    oauth.loginPage("/login");
                     oauth.successHandler(customOAuth2AuthenticationSuccessHandler);
 //                    oauth.failureHandler(new
 //                            SimpleUrlAuthenticationFailureHandler("/login?error=true"));
@@ -78,6 +75,18 @@ public class WebSecurityConfig {
         http.addFilterBefore(authJwtTokenFilter(), UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
+    }
+
+    @Bean
+    CorsConfigurationSource corsConfigurationSource() {
+        CorsConfiguration configuration = new CorsConfiguration();
+        configuration.setAllowedOrigins(List.of(frontendUrl));
+        configuration.addAllowedHeader("*");
+        configuration.addAllowedMethod("*");
+        configuration.setAllowCredentials(true);
+        UrlBasedCorsConfigurationSource urlBasedCorsConfigurationSource = new UrlBasedCorsConfigurationSource();
+        urlBasedCorsConfigurationSource.registerCorsConfiguration("/**", configuration);
+        return urlBasedCorsConfigurationSource;
     }
 
 

@@ -35,7 +35,7 @@ public class Booking {
     private Date expiredTime;
 
     @Column(name = "total_amount")
-    private int totalAmount;
+    private Integer totalAmount;
 
     @Column(name = "full_protection")
     private Boolean fullProtection;
@@ -51,6 +51,12 @@ public class Booking {
 
     @Column(name = "status")
     private String status;
+
+    @Column(name = "external_id")
+    private String externalId;
+
+    @Column(name = "payment_id")
+    private String paymentId;
 
     @Timestamp
     @Temporal(TemporalType.TIMESTAMP)
