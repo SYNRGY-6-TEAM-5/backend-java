@@ -12,6 +12,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import static com.finalproject.Tiket.Pesawat.utils.Constants.CONSTANT_PAYMENT_STATUS_FAILED;
+import static com.finalproject.Tiket.Pesawat.utils.Constants.CONSTANT_PAYMENT_STATUS_PENDING;
 
 @Component
 @Log4j2
@@ -20,13 +21,14 @@ public class DeleteExpirationPaymentVA {
     @Autowired
     private BookingRepository bookingRepository;
 
-    @Scheduled(fixedRate = 60000) // runs every 60 seconds
-    public void updatePaymentStatusVAExpired() {
-        List<Booking> expiredBookingVA = bookingRepository.findAllByExpiredTimeBefore(new Date());
-        if (!expiredBookingVA.isEmpty()) {
-            updateBookingStatus(expiredBookingVA);
-        }
-    }
+//    @Scheduled(fixedRate = 60000) // berjalan setiap 60 detik
+//    public void updatePaymentStatusVAExpired() {
+//        List<Booking> pendingExpiredBookings = bookingRepository.findAllByExpiredTimeBeforeAndStatus(new Date(),
+//                CONSTANT_PAYMENT_STATUS_PENDING);
+//        if (!pendingExpiredBookings.isEmpty()) {
+//            updateBookingStatus(pendingExpiredBookings);
+//        }
+//    }
 
     private void updateBookingStatus(List<Booking> bookings) {
         List<Booking> updatedBookings = bookings.stream()
@@ -34,7 +36,7 @@ public class DeleteExpirationPaymentVA {
                 .collect(Collectors.toList());
 
         bookingRepository.saveAll(updatedBookings);
-        log.info("Successfully updated status to Failed for expiredtime VA scheduler");
+        log.info("Berhasil memperbarui status menjadi GAGAL untuk scheduler VA yang kadaluarsa");
     }
 
 }
