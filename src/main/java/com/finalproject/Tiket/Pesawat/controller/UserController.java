@@ -1,7 +1,9 @@
 package com.finalproject.Tiket.Pesawat.controller;
 
 
+import com.finalproject.Tiket.Pesawat.dto.SuccesMessageDTO;
 import com.finalproject.Tiket.Pesawat.dto.user.request.UpdateProfileRequest;
+import com.finalproject.Tiket.Pesawat.dto.user.request.UpdateUserFcmTokenRequest;
 import com.finalproject.Tiket.Pesawat.dto.user.request.UploadImageRequest;
 import com.finalproject.Tiket.Pesawat.dto.user.response.UpdateProfileResponse;
 import com.finalproject.Tiket.Pesawat.dto.user.response.UploadFileResponse;
@@ -45,6 +47,13 @@ public class UserController {
         return ResponseEntity.ok(userDetailsResponse);
     }
 
+    @PostMapping("/fcm-token")
+    public ResponseEntity<SuccesMessageDTO> setFcmToken(@RequestBody
+                                                        @Valid
+                                                        UpdateUserFcmTokenRequest userFcmTokenRequest) {
+        SuccesMessageDTO response = userService.setFcmToken(userFcmTokenRequest);
+        return ResponseEntity.ok(response);
+    }
 
 
 }

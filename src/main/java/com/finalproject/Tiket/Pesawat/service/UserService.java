@@ -3,6 +3,7 @@ package com.finalproject.Tiket.Pesawat.service;
 import com.finalproject.Tiket.Pesawat.dto.SuccesMessageDTO;
 import com.finalproject.Tiket.Pesawat.dto.user.request.DeleteUserRequest;
 import com.finalproject.Tiket.Pesawat.dto.user.request.UpdateProfileRequest;
+import com.finalproject.Tiket.Pesawat.dto.user.request.UpdateUserFcmTokenRequest;
 import com.finalproject.Tiket.Pesawat.dto.user.request.UploadImageRequest;
 import com.finalproject.Tiket.Pesawat.dto.user.response.UpdateProfileResponse;
 import com.finalproject.Tiket.Pesawat.dto.user.response.UploadFileResponse;
@@ -23,4 +24,6 @@ public interface UserService {
     List<User> getAllUser(int page, int size);
 
     SuccesMessageDTO deleteUserById(DeleteUserRequest deleteUserRequest);
+
+    SuccesMessageDTO setFcmToken(UpdateUserFcmTokenRequest userFcmTokenRequest);
 }
