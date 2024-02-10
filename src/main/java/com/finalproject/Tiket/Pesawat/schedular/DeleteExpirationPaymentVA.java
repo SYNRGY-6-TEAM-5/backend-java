@@ -34,7 +34,7 @@ public class DeleteExpirationPaymentVA {
                 .collect(Collectors.toList());
 
         bookingRepository.saveAll(updatedBookings);
-        log.info("Successfully updated status to CONSTANT_PAYMENT_FAILED for expiredtime VA scheduler");
+        log.info("Successfully updated status to Failed for expiredtime VA scheduler");
     }
 
 }
