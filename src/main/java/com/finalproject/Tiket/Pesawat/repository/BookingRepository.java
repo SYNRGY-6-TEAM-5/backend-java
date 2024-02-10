@@ -14,6 +14,6 @@ public interface BookingRepository extends JpaRepository<Booking, Integer>, JpaS
 
     Optional<Booking> findByExternalId(String externalId);
 
-    List<Booking> findAllByExpiredTimeBefore(Date date);
+    List<Booking> findAllByExpiredTimeBeforeAndStatus(Date date, String status);
 }
 
