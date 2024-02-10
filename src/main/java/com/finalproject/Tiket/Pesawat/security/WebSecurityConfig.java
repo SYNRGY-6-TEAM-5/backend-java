@@ -59,6 +59,8 @@ public class WebSecurityConfig {
                                         , "api/v1/airport/**", "api/v1/arrival/**", "api/v1/departure/**",
                                         "api/v1/server/**"
                                 ).permitAll()
+                                .requestMatchers("api/v1/xendit-payment/webhook-create",
+                                        "api/v1/xendit-payment/webhook-paid").permitAll()
                                 .anyRequest()
                                 .authenticated())
                 .httpBasic(basic -> basic.authenticationEntryPoint(unauthorizedHandler))
