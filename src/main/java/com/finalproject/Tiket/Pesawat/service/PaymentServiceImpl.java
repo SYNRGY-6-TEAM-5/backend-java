@@ -1,6 +1,7 @@
 package com.finalproject.Tiket.Pesawat.service;
 
 import com.finalproject.Tiket.Pesawat.dto.PaymentResponseDTO;
+import com.finalproject.Tiket.Pesawat.dto.firebase.request.NotificationRequest;
 import com.finalproject.Tiket.Pesawat.dto.payment.request.CreateVaPaymentRequest;
 import com.finalproject.Tiket.Pesawat.dto.payment.request.RequestWebhookXendit;
 import com.finalproject.Tiket.Pesawat.dto.payment.request.RequestWebhookXenditPaid;
@@ -33,6 +34,7 @@ import java.time.Instant;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.util.*;
+import java.util.concurrent.ExecutionException;
 import java.util.stream.Collectors;
 
 import static com.finalproject.Tiket.Pesawat.utils.Constants.CONSTANT_PAYMENT_STATUS_SUCCESS;
@@ -59,6 +61,9 @@ public class PaymentServiceImpl implements PaymentService {
 
     @Value("${aeroswift.xendit.username}")
     private String username;
+
+    @Autowired
+    private FCMService fcmService;
 
     @Override
     public PaymentResponseDTO createPaymentXendit(CreateVaPaymentRequest request) {
@@ -91,7 +96,7 @@ public class PaymentServiceImpl implements PaymentService {
 
                 Booking booking = bookingOptional.get();
                 User user = userOptional.get();
-                if (!booking.getUser().getUuid().equals(user.getUuid())){
+                if (!booking.getUser().getUuid().equals(user.getUuid())) {
                     throw new ExceptionHandling("User does not have a booking");
                 }
                 String externalId = "external_id_" + Instant.now().getEpochSecond() + "_" + user.getUuid();
@@ -155,6 +160,17 @@ public class PaymentServiceImpl implements PaymentService {
             booking.setBookingCode(Utils.generateBookingCode(booking.getBookingId(), booking.getUser().getUuid().toString()));
             booking.setUpdatedAt(Utils.getCurrentDateTimeAsDate());
             bookingRepository.save(booking);
+            NotificationRequest notificationRequest = NotificationRequest.builder()
+                    .title("Virtual Account Created Successfully") // todo create constant
+                    .body("Your virtual account has been successfully created for payment with "
+                            + requestWebhook.getBank_code() + ".")
+                    .token(booking.getUser().getFcmToken())
+                    .build();
+            try {
+                fcmService.sendMessageToToken(notificationRequest);
+            } catch (InterruptedException | ExecutionException e) {
+                log.error(e.getMessage());
+            }
             log.info("success create va");
             return "success";
         } else {
@@ -187,6 +203,18 @@ public class PaymentServiceImpl implements PaymentService {
             booking.setUpdatedAt(Date.from(gmtPlus7.toInstant()));
 
             bookingRepository.save(booking);
+            NotificationRequest paymentSuccessNotification = NotificationRequest.builder()
+                    .title("Payment Successful") // todo create constant
+                    .body("Your payment for booking " + booking.getBookingCode() + " has been successfully paid.")
+                    .token(booking.getUser().getFcmToken())
+                    .build();
+
+            try {
+                fcmService.sendMessageToToken(paymentSuccessNotification);
+            } catch (InterruptedException | ExecutionException e) {
+                log.error(e.getMessage());
+            }
+
             log.info("saving va to booking table");
             return "success";
         } else {

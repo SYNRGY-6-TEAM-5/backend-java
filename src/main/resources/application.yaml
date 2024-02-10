@@ -17,7 +17,7 @@ spring:
     repair: true
   jpa:
     hibernate:
-      ddl-auto: validate
+      ddl-auto: update
     properties:
       hibernate:
         dialect: org.hibernate.dialect.PostgreSQLDialect
@@ -58,6 +58,7 @@ springdoc:
   operations-sorter: method
 
 aeroswift:
+  firebase-configuration-file: google-service.json
   openapi:
     dev-url: https://backend-java-production-ece2.up.railway.app
   xendit:
