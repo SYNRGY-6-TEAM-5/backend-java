@@ -52,7 +52,7 @@ public class PaymentController {
 
 
     // todo buat retailnya juga ( 2 ENDPOINT)
-    @Hidden
+
     @PostMapping("/xendit-payment/create-va")
     public ResponseEntity<PaymentResponseDTO> paymentXendit(@Valid @RequestBody CreateVaPaymentRequest request) {
         PaymentResponseDTO response = paymentService.createPaymentXendit(request);
@@ -69,6 +69,7 @@ public class PaymentController {
     }
 
     @PostMapping("/xendit-payment/webhook-paid")
+    @Hidden
     public ResponseEntity webhookXenditPaid(@RequestHeader("x-callback-token") String xCallbackToken,
                                             @RequestBody RequestWebhookXendit requestWebhook) { // todo paid requestnya berebeda dengan create
         log.info("executing webhhook");
