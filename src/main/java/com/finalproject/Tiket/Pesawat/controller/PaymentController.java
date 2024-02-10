@@ -7,6 +7,7 @@ import com.finalproject.Tiket.Pesawat.dto.payment.response.SupportPaymentRespons
 import com.finalproject.Tiket.Pesawat.service.PaymentService;
 import com.xendit.enums.BankCode;
 import com.xendit.model.FixedPaymentCode;
+import io.swagger.v3.oas.annotations.Hidden;
 import jakarta.validation.Valid;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,6 +32,9 @@ public class PaymentController {
     @Autowired
     private PaymentService paymentService;
 
+    @Value("${aeroswift.xendit.username}")
+    private String username;
+
     @GetMapping("/success-payment")
     public ModelAndView showSuccessPage() {
         ModelAndView modelAndView = new ModelAndView();
@@ -45,10 +49,10 @@ public class PaymentController {
         return modelAndView;
     }
 
-    @Value("${aeroswift.xendit.username}")
-    private String username;
+
 
     // todo buat retailnya juga ( 2 ENDPOINT)
+    @Hidden
     @PostMapping("/xendit-payment/create-va")
     public ResponseEntity<PaymentResponseDTO> paymentXendit(@Valid @RequestBody CreateVaPaymentRequest request) {
         PaymentResponseDTO response = paymentService.createPaymentXendit(request);
@@ -56,6 +60,7 @@ public class PaymentController {
     }
 
     @PostMapping("/xendit-payment/webhook-create")
+    @Hidden
     public ResponseEntity webhookXenditCreate(@RequestHeader("x-callback-token") String xCallbackToken,
                                               @RequestBody RequestWebhookXendit requestWebhook) {
         log.info("executing webhhook");
