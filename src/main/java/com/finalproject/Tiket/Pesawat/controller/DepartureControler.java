@@ -16,12 +16,10 @@ public class DepartureControler {
     @Autowired
     private DepartureService departureService;
 
-
     @GetMapping()
     public ResponseEntity<ResponseListDeparture> departureResponseEntity() {
         ResponseListDeparture response = departureService.getListDeparture();
         return ResponseEntity.ok(response);
     }
-
 
 }

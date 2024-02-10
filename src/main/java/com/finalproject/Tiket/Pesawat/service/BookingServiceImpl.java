@@ -2,6 +2,7 @@ package com.finalproject.Tiket.Pesawat.service;
 
 import com.finalproject.Tiket.Pesawat.dto.SuccesMessageDTO;
 import com.finalproject.Tiket.Pesawat.dto.booking.request.DeleteBookingRequest;
+import com.finalproject.Tiket.Pesawat.dto.firebase.request.NotificationRequest;
 import com.finalproject.Tiket.Pesawat.dto.user.request.UserRequestBooking;
 import com.finalproject.Tiket.Pesawat.dto.user.response.UserBookingResponse;
 import com.finalproject.Tiket.Pesawat.exception.ExceptionHandling;
@@ -24,6 +25,7 @@ import org.springframework.stereotype.Service;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
+import java.util.concurrent.ExecutionException;
 
 import static com.finalproject.Tiket.Pesawat.utils.Constants.CONSTANT_PAYMENT_STATUS_PENDING;
 import static com.finalproject.Tiket.Pesawat.utils.Constants.PAYMENT_EXPIRED_TIME;
@@ -38,6 +40,9 @@ public class BookingServiceImpl implements BookingService {
 
     @Autowired
     private UserRepository userRepository;
+
+    @Autowired
+    private FCMService fcmService;
 
     @Override
     public List<Booking> getBookingByUser() {
@@ -63,8 +68,7 @@ public class BookingServiceImpl implements BookingService {
                 }
 
                 return booking;
-            }
-            else if (principal instanceof OAuth2User) {
+            } else if (principal instanceof OAuth2User) {
                 log.info("oauth2 user bos" + ((OAuth2User) principal).getName() + ((OAuth2User) principal).getAttributes());
                 Optional<User> userOptional = userRepository.findByEmailAddress(((OAuth2User) principal).getName());
 
@@ -80,8 +84,7 @@ public class BookingServiceImpl implements BookingService {
                 }
 
                 return booking;
-            }
-            else if (principal instanceof String) {
+            } else if (principal instanceof String) {
                 throw new UnauthorizedHandling("User not authenticated");
             }
 
@@ -125,6 +128,19 @@ public class BookingServiceImpl implements BookingService {
 
                 bookingRepository.save(bookingUser);
                 log.info("success create booking");
+
+                NotificationRequest bookingCreationNotification = NotificationRequest.builder()
+                        .title("Booking Created Successfully")
+                        .body("Your booking has been successfully created.")
+                        .token(bookingUser.getUser().getFcmToken())
+                        .build();
+
+                try {
+                    fcmService.sendMessageToToken(bookingCreationNotification);
+                } catch (InterruptedException | ExecutionException e) {
+                    log.error(e.getMessage());
+                }
+
 
             } else if (principal instanceof String) {
                 throw new UnauthorizedHandling("User not authenticated");
