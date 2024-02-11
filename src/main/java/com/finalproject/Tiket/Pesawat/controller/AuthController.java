@@ -2,6 +2,7 @@ package com.finalproject.Tiket.Pesawat.controller;
 
 import com.finalproject.Tiket.Pesawat.dto.auth.request.ForgotPasswordRequest;
 import com.finalproject.Tiket.Pesawat.dto.auth.request.RequestEditUser;
+import com.finalproject.Tiket.Pesawat.dto.auth.request.RequestRefreshToken;
 import com.finalproject.Tiket.Pesawat.dto.auth.request.SignUpRequest;
 import com.finalproject.Tiket.Pesawat.dto.auth.response.ForgotPasswordResponse;
 import com.finalproject.Tiket.Pesawat.dto.auth.response.ResponseEditPassword;
@@ -16,8 +17,10 @@ import com.finalproject.Tiket.Pesawat.security.jwt.JwtUtils;
 import com.finalproject.Tiket.Pesawat.security.service.UserDetailsImpl;
 import com.finalproject.Tiket.Pesawat.service.AuthService;
 import com.finalproject.Tiket.Pesawat.service.OTPService;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -26,6 +29,7 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.stream.Collectors;
@@ -79,6 +83,20 @@ public class AuthController {
                     .build());
         } catch (BadCredentialsException e) {
             throw new UnauthorizedHandling("Failed Login, Wrong Email or Password");
+        }
+    }
+
+    @PostMapping("/refresh-token")
+    public ResponseEntity<JwtResponse> refreshToken(HttpServletRequest request) {
+        String authorizationHeader = request.getHeader(HttpHeaders.AUTHORIZATION);
+
+        if (authorizationHeader != null && authorizationHeader.startsWith("Bearer ")) {
+            String refreshToken = authorizationHeader.substring(7); // Extract the token excluding "Bearer "
+
+            JwtResponse response = authService.generateRefreshToken(refreshToken);
+            return ResponseEntity.ok(response);
+        } else {
+            return ResponseEntity.badRequest().build();
         }
     }
 

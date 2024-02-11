@@ -27,6 +27,8 @@ public class JwtUtils {
     private String jwtSecret;
     @Value("${binar.app.jwtExpirationMs}")
     private int jwtExpirationMs;
+    @Value("${binar.app.jwtRefreshExpirationMs}")
+    private Long jwtRefreshExpirationMs;
 
 
     public String generateToken(Authentication authentication){
@@ -42,6 +44,21 @@ public class JwtUtils {
                 .signWith(key(), SignatureAlgorithm.HS256)
                 .compact();
     }
+
+    public String generateRefreshToken(Authentication authentication) {
+        UserDetailsImpl userPrincipal = (UserDetailsImpl) authentication.getPrincipal();
+        Date now = new Date();
+        return Jwts.builder()
+                .setSubject(userPrincipal.getUsername())
+                .claim("role", userPrincipal.getAuthorities().stream().map(GrantedAuthority::getAuthority)
+                        .collect(Collectors.joining(",")))
+                .claim("userId", userPrincipal.getUserId())
+                .setIssuedAt(now)
+                .setExpiration(new Date(now.getTime() + jwtRefreshExpirationMs))
+                .signWith(key(), SignatureAlgorithm.HS256)
+                .compact();
+    }
+
 
     public String generateDummyToken() {
         Date now = new Date();
