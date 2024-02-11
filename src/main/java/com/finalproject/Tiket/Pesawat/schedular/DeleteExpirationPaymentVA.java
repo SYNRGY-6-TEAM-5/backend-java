@@ -48,17 +48,23 @@ public class DeleteExpirationPaymentVA {
 
     private void sendNotificationForFailedPayments(List<Booking> failedBookings) {
         failedBookings.forEach(booking -> {
-            NotificationRequest notificationRequest = NotificationRequest.builder()
-                    .title("Payment Failed")
-                    .body("Your payment for booking with ID " + booking.getBookingId() + " has failed.")
-                    .token(booking.getUser().getFcmToken())
-                    .build();
-            try {
-                fcmService.sendMessageToToken(notificationRequest);
-            } catch (InterruptedException | ExecutionException e) {
-                log.error("Error sending notification for payment failure: " + e.getMessage());
+            String fcmToken = booking.getUser().getFcmToken();
+
+            if (fcmToken != null) {
+                NotificationRequest notificationRequest = NotificationRequest.builder()
+                        .title("Payment Failed")
+                        .body("Your payment for booking with ID " + booking.getBookingId() + " has failed.")
+                        .token(fcmToken)
+                        .build();
+                try {
+                    fcmService.sendMessageToToken(notificationRequest);
+                    log.info("Success Send Failed Message FCM");
+                } catch (InterruptedException | ExecutionException e) {
+                    log.error("Error sending notification for payment failure: " + e.getMessage());
+                }
+            } else {
+                log.warn("FCM token is null for booking with ID " + booking.getBookingId() + ". Notification not sent.");
             }
-            log.info("Success Send Failed Message FCM");
         });
     }
 

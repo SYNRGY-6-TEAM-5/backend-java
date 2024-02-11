@@ -135,10 +135,12 @@ public class BookingServiceImpl implements BookingService {
                         .token(bookingUser.getUser().getFcmToken())
                         .build();
 
-                try {
-                    fcmService.sendMessageToToken(bookingCreationNotification);
-                } catch (InterruptedException | ExecutionException e) {
-                    log.error(e.getMessage());
+                if(userOptional.get().getFcmToken() != null) {
+                    try {
+                        fcmService.sendMessageToToken(bookingCreationNotification);
+                    } catch (InterruptedException | ExecutionException e) {
+                        log.error(e.getMessage());
+                    }
                 }
 
 
