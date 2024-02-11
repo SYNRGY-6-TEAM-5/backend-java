@@ -19,6 +19,7 @@ import com.xendit.enums.BankCode;
 import com.xendit.exception.XenditException;
 import com.xendit.model.FixedPaymentCode;
 import com.xendit.model.FixedVirtualAccount;
+import com.xendit.model.Invoice;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -166,10 +167,12 @@ public class PaymentServiceImpl implements PaymentService {
                             + requestWebhook.getBank_code() + ".")
                     .token(booking.getUser().getFcmToken())
                     .build();
-            try {
-                fcmService.sendMessageToToken(notificationRequest);
-            } catch (InterruptedException | ExecutionException e) {
-                log.error(e.getMessage());
+            if (booking.getUser().getFcmToken() != null) {
+                try {
+                    fcmService.sendMessageToToken(notificationRequest);
+                } catch (InterruptedException | ExecutionException e) {
+                    log.error(e.getMessage());
+                }
             }
             log.info("success create va");
             return "success";
@@ -209,10 +212,12 @@ public class PaymentServiceImpl implements PaymentService {
                     .token(booking.getUser().getFcmToken())
                     .build();
 
-            try {
-                fcmService.sendMessageToToken(paymentSuccessNotification);
-            } catch (InterruptedException | ExecutionException e) {
-                log.error(e.getMessage());
+            if (booking.getUser().getFcmToken() != null) {
+                try {
+                    fcmService.sendMessageToToken(paymentSuccessNotification);
+                } catch (InterruptedException | ExecutionException e) {
+                    log.error(e.getMessage());
+                }
             }
 
             log.info("saving va to booking table");
