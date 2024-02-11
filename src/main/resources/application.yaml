@@ -47,6 +47,7 @@ binar:
   app:
     jwtSecret: 357638792F423F4428472B4B6250655368566D597133743677397A2443264629
     jwtExpirationMs: 3600000
+    jwtRefreshExpirationMs: 2678400000 # 1 month
     baseUrl: http://backend-java-production-ece2.up.railway.app/api/
 
 cloudinary:
