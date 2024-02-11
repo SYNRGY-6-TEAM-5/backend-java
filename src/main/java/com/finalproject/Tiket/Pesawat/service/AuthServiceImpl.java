@@ -2,6 +2,7 @@ package com.finalproject.Tiket.Pesawat.service;
 
 import com.finalproject.Tiket.Pesawat.dto.auth.request.ForgotPasswordRequest;
 import com.finalproject.Tiket.Pesawat.dto.auth.request.RequestEditUser;
+import com.finalproject.Tiket.Pesawat.dto.auth.request.RequestRefreshToken;
 import com.finalproject.Tiket.Pesawat.dto.auth.request.SignUpRequest;
 import com.finalproject.Tiket.Pesawat.dto.auth.response.ForgotPasswordResponse;
 import com.finalproject.Tiket.Pesawat.dto.auth.response.ResponseEditPassword;
@@ -12,19 +13,27 @@ import com.finalproject.Tiket.Pesawat.exception.UnauthorizedHandling;
 import com.finalproject.Tiket.Pesawat.model.OtpForgotPassword;
 import com.finalproject.Tiket.Pesawat.model.OtpRegister;
 import com.finalproject.Tiket.Pesawat.model.User;
+import com.finalproject.Tiket.Pesawat.payload.response.JwtResponse;
 import com.finalproject.Tiket.Pesawat.repository.UserRepository;
+import com.finalproject.Tiket.Pesawat.security.jwt.JwtUtils;
+import com.finalproject.Tiket.Pesawat.security.service.UserDetailServiceImpl;
 import com.finalproject.Tiket.Pesawat.security.service.UserDetailsImpl;
 import com.finalproject.Tiket.Pesawat.utils.Utils;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Async;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.security.core.GrantedAuthority;
+
 
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
+import java.util.stream.Collectors;
 
 import static com.finalproject.Tiket.Pesawat.utils.Constants.CONSTANT_EMAIL_TEST_FORGOT;
 import static com.finalproject.Tiket.Pesawat.utils.Constants.CONSTANT_EMAIL_TEST_SIGNUP;
@@ -38,7 +47,10 @@ public class AuthServiceImpl implements AuthService {
     private OTPService otpService;
     @Autowired
     private PasswordEncoder passwordEncoder;
-
+    @Autowired
+    private JwtUtils jwtUtils;
+    @Autowired
+    private UserDetailServiceImpl userDetailsService;
 
     @Override
     public ForgotPasswordResponse forgotPasswordUser(ForgotPasswordRequest request) {
@@ -146,6 +158,33 @@ public class AuthServiceImpl implements AuthService {
                 .status(true)
                 .message("Success Update User Password")
                 .build();
+    }
+
+    @Override
+    public JwtResponse generateRefreshToken(String refreshToken) {
+        try {
+            if (jwtUtils.validateJwtToken(refreshToken)) {
+                String username = jwtUtils.getUserNameFromJwtToken(refreshToken);
+                UserDetails userDetails = userDetailsService.loadUserByUsername(username);
+                UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(
+                        userDetails, null, userDetails.getAuthorities());
+                SecurityContextHolder.getContext().setAuthentication(authenticationToken);
+                String newAccessToken = jwtUtils.generateToken(authenticationToken);
+                return JwtResponse.builder()
+                        .token(newAccessToken)
+                        .type("Bearer")
+                        .email(userDetails.getUsername())
+                        .roles(userDetails.getAuthorities().stream()
+                                .map(GrantedAuthority::getAuthority)
+                                .collect(Collectors.toList()))
+                        .build();
+            } else {
+                throw new UnauthorizedHandling("Invalid refresh token");
+            }
+        } catch (Exception e) {
+            log.error("Error while generating refresh token: {}", e.getMessage());
+            throw new ExceptionHandling("Error while generating refresh token");
+        }
     }
 
 }
