@@ -28,14 +28,24 @@ public class AuthTokenFilter extends OncePerRequestFilter {
 
     private static final Logger logger = LoggerFactory.getLogger(AuthTokenFilter.class);
 
+
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
             throws ServletException, IOException {
-//        logger.info("User accessed resource '{}'", request.getRequestURI());
+        logger.info("User accessed resource '{}'", request.getRequestURI());
+        String requestUri = request.getRequestURI();
+
         try {
             String jwt = parseJwt(request);
-            if (jwt != null && jwtUtils.validateJwtToken(jwt)) {
+            if (requestUri.equals("api/v1/auth/refresh-token") && jwt != null && jwtUtils.validateRefreshToken(jwt)) {
+                // Skip the filter chain for refresh token endpoint
+                logger.info("access here");
+                filterChain.doFilter(request, response);
+                return;
+            } else if (jwt != null && jwtUtils.validateJwtToken(jwt)) {
                 String username = jwtUtils.getUserNameFromJwtToken(jwt);
+                logger.info("access else");
+
 
                 UserDetails userDetails = userDetailsService.loadUserByUsername(username);
                 UsernamePasswordAuthenticationToken authentication =
@@ -53,6 +63,7 @@ public class AuthTokenFilter extends OncePerRequestFilter {
 
         filterChain.doFilter(request, response);
     }
+
 
     private String parseJwt(HttpServletRequest request) {
         String headerAuth = request.getHeader("Authorization");

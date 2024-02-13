@@ -2,7 +2,6 @@ package com.finalproject.Tiket.Pesawat.service;
 
 import com.finalproject.Tiket.Pesawat.dto.auth.request.ForgotPasswordRequest;
 import com.finalproject.Tiket.Pesawat.dto.auth.request.RequestEditUser;
-import com.finalproject.Tiket.Pesawat.dto.auth.request.RequestRefreshToken;
 import com.finalproject.Tiket.Pesawat.dto.auth.request.SignUpRequest;
 import com.finalproject.Tiket.Pesawat.dto.auth.response.ForgotPasswordResponse;
 import com.finalproject.Tiket.Pesawat.dto.auth.response.ResponseEditPassword;
@@ -24,12 +23,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-import org.springframework.security.core.GrantedAuthority;
-
 
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
@@ -124,7 +122,7 @@ public class AuthServiceImpl implements AuthService {
 
             if (principal instanceof UserDetailsImpl) {
 
-                if (((UserDetailsImpl) principal).getUsername().equals(CONSTANT_EMAIL_TEST_FORGOT)){
+                if (((UserDetailsImpl) principal).getUsername().equals(CONSTANT_EMAIL_TEST_FORGOT)) {
                     return ResponseEditPassword.builder()
                             .status(true)
                             .message("Success Update User Password")
@@ -163,24 +161,21 @@ public class AuthServiceImpl implements AuthService {
     @Override
     public JwtResponse generateRefreshToken(String refreshToken) {
         try {
-            if (jwtUtils.validateJwtToken(refreshToken)) {
-                String username = jwtUtils.getUserNameFromJwtToken(refreshToken);
-                UserDetails userDetails = userDetailsService.loadUserByUsername(username);
-                UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(
-                        userDetails, null, userDetails.getAuthorities());
-                SecurityContextHolder.getContext().setAuthentication(authenticationToken);
-                String newAccessToken = jwtUtils.generateToken(authenticationToken);
-                return JwtResponse.builder()
-                        .token(newAccessToken)
-                        .type("Bearer")
-                        .email(userDetails.getUsername())
-                        .roles(userDetails.getAuthorities().stream()
-                                .map(GrantedAuthority::getAuthority)
-                                .collect(Collectors.toList()))
-                        .build();
-            } else {
-                throw new UnauthorizedHandling("Invalid refresh token");
-            }
+            String username = jwtUtils.getUserNameFromJwtToken(refreshToken);
+            UserDetails userDetails = userDetailsService.loadUserByUsername(username);
+            UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(
+                    userDetails, null, userDetails.getAuthorities());
+            SecurityContextHolder.getContext().setAuthentication(authenticationToken);
+            String newAccessToken = jwtUtils.generateToken(authenticationToken);
+            return JwtResponse.builder()
+                    .token(newAccessToken)
+                    .refreshToken(refreshToken)
+                    .type("Bearer")
+                    .email(userDetails.getUsername())
+                    .roles(userDetails.getAuthorities().stream()
+                            .map(GrantedAuthority::getAuthority)
+                            .collect(Collectors.toList()))
+                    .build();
         } catch (Exception e) {
             log.error("Error while generating refresh token: {}", e.getMessage());
             throw new ExceptionHandling("Error while generating refresh token");

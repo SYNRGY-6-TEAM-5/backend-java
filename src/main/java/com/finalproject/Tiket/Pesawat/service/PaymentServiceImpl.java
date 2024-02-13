@@ -19,7 +19,6 @@ import com.xendit.enums.BankCode;
 import com.xendit.exception.XenditException;
 import com.xendit.model.FixedPaymentCode;
 import com.xendit.model.FixedVirtualAccount;
-import com.xendit.model.Invoice;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
