@@ -11,8 +11,8 @@ import jakarta.validation.Valid;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.servlet.ModelAndView;
 
 @Log4j2
 @RestController
@@ -22,22 +22,7 @@ public class PaymentController {
     @Autowired
     private PaymentService paymentService;
 
-    @GetMapping("/success-payment")
-    public ModelAndView showSuccessPage() {
-        ModelAndView modelAndView = new ModelAndView();
-        modelAndView.setViewName("success");
-        return modelAndView;
-    }
-
-    @GetMapping("/failed-payment")
-    public ModelAndView showFailedPage() {
-        ModelAndView modelAndView = new ModelAndView();
-        modelAndView.setViewName("failed");
-        return modelAndView;
-    }
-
-    // todo buat retailnya juga ( 2 ENDPOINT)
-
+    @PreAuthorize("hasAuthority('USER')")
     @PostMapping("/xendit-payment/create-va")
     public ResponseEntity<PaymentResponseDTO> paymentXendit(@Valid @RequestBody CreateVaPaymentRequest request) {
         PaymentResponseDTO response = paymentService.createPaymentXendit(request);

@@ -34,9 +34,6 @@ import java.util.Map;
 public class CustomOauth2AuthenticationSuccessHandler extends SavedRequestAwareAuthenticationSuccessHandler {
 
     @Autowired
-    private JwtUtils jwtUtils;
-
-    @Autowired
     private UserRepository userRepository;
 
     @Autowired
@@ -59,6 +56,7 @@ public class CustomOauth2AuthenticationSuccessHandler extends SavedRequestAwareA
             Map<String, Object> attributes = principal.getAttributes();
             log.info(attributes);
             String email = attributes.get("email").toString();
+
 
             userRepository.findByEmailAddress(email)
                     .ifPresentOrElse(user -> {

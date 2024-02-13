@@ -2,7 +2,6 @@ package com.finalproject.Tiket.Pesawat.controller;
 
 import com.finalproject.Tiket.Pesawat.dto.auth.request.ForgotPasswordRequest;
 import com.finalproject.Tiket.Pesawat.dto.auth.request.RequestEditUser;
-import com.finalproject.Tiket.Pesawat.dto.auth.request.RequestRefreshToken;
 import com.finalproject.Tiket.Pesawat.dto.auth.request.SignUpRequest;
 import com.finalproject.Tiket.Pesawat.dto.auth.response.ForgotPasswordResponse;
 import com.finalproject.Tiket.Pesawat.dto.auth.response.ResponseEditPassword;
@@ -29,7 +28,6 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.stream.Collectors;
@@ -65,16 +63,19 @@ public class AuthController {
                         .build());
             }
 
+
             Authentication authentication = authenticationManager.authenticate(
                     new UsernamePasswordAuthenticationToken(loginDto.getEmailAddress(), loginDto.getPassword()));
 
             SecurityContextHolder.getContext().setAuthentication(authentication);
             String jwt = jwtUtils.generateToken(authentication);
+            String refreshToken = jwtUtils.generateRefreshToken(authentication);
 
             UserDetailsImpl userDetails = (UserDetailsImpl) authentication.getPrincipal();
 
             return ResponseEntity.ok(JwtResponse.builder()
                     .token(jwt)
+                    .refreshToken(refreshToken)
                     .type("Bearer")
                     .email(userDetails.getUsername())
                     .roles(userDetails.getAuthorities().stream()
