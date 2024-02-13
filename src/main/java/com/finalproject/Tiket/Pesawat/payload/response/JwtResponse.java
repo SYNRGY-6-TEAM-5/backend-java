@@ -13,6 +13,7 @@ import java.util.List;
 @AllArgsConstructor
 public class JwtResponse {
     private String token;
+    private String refreshToken;
     private String type = "Bearer";
     private String email;
     private List<String> roles;

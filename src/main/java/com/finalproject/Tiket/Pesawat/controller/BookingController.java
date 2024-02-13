@@ -7,12 +7,14 @@ import com.finalproject.Tiket.Pesawat.service.BookingService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
 @RestController
 @RequestMapping("/api/v1/booking")
+@PreAuthorize("hasAuthority('USER') || hasAuthority('ADMIN')")
 public class BookingController {
 
     @Autowired
