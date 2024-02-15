@@ -199,7 +199,6 @@ public class PaymentServiceImpl implements PaymentService {
             throw new UnauthorizedHandling("Failed Signature");
         }
 
-        // todo issued ticket
         Optional<Booking> bookingOptional = bookingRepository.findByExternalId(requestWebhook.getExternal_id());
 
         if (bookingOptional.isPresent()) {
@@ -235,11 +234,11 @@ public class PaymentServiceImpl implements PaymentService {
                 String pdfFilePath = "reports/invoice_aeroswift.pdf";
                 JasperExportManager.exportReportToPdfFile(jasperPrint, pdfFilePath);
 
-                EmailDetails emailDetails = new EmailDetails();
-                EmailDetails.builder()
-                        .recipient(booking.getUser().getEmailAddress())
+                String email = booking.getUser().getEmailAddress();
+                EmailDetails emailDetails = EmailDetails.builder()
+                        .recipient(email)
                         .subject("Your Invoice Aeroswift")
-                        .msgBody("Here Is Your Invoice")
+                        .msgBody(emailService.getInvoiceEmailTemplate(email))
                         .attachment(pdfFilePath)
                         .build();
 
