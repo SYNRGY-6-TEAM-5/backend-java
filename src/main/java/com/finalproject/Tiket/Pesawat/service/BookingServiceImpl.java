@@ -34,6 +34,12 @@ import static com.finalproject.Tiket.Pesawat.utils.Constants.PAYMENT_EXPIRED_TIM
 @Log4j2
 public class BookingServiceImpl implements BookingService {
 
+    @Autowired
+    private ReportService reportService;
+
+    @Autowired
+    private EmailService emailService;
+
 
     @Autowired
     private BookingRepository bookingRepository;
@@ -142,7 +148,6 @@ public class BookingServiceImpl implements BookingService {
                         log.error(e.getMessage());
                     }
                 }
-
 
             } else if (principal instanceof String) {
                 throw new UnauthorizedHandling("User not authenticated");
