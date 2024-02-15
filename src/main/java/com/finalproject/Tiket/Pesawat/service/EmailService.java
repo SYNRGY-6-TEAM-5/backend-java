@@ -6,11 +6,10 @@ import java.util.concurrent.CompletableFuture;
 
 public interface EmailService {
     CompletableFuture<Void> sendEmail(EmailDetails emailDetails);
+    CompletableFuture<Void> sendEmailWithAttachment(EmailDetails emailDetails);
     String getForgotPasswordEmailTemplate(String otp);
 
     String getWelcomingMessageEmailTemplate();
 
     String getRegisterOtpEmailTemplate(String email, String otp);
-
-    String getForgotSendPassword(String emailAddress, String newPassword);
 }

@@ -1,6 +1,7 @@
 package com.finalproject.Tiket.Pesawat.service;
 
 import com.finalproject.Tiket.Pesawat.dto.PaymentResponseDTO;
+import com.finalproject.Tiket.Pesawat.dto.email.EmailDetails;
 import com.finalproject.Tiket.Pesawat.dto.firebase.request.NotificationRequest;
 import com.finalproject.Tiket.Pesawat.dto.payment.request.CreateVaPaymentRequest;
 import com.finalproject.Tiket.Pesawat.dto.payment.request.RequestWebhookXendit;
@@ -20,6 +21,8 @@ import com.xendit.exception.XenditException;
 import com.xendit.model.FixedPaymentCode;
 import com.xendit.model.FixedVirtualAccount;
 import lombok.extern.slf4j.Slf4j;
+import net.sf.jasperreports.engine.JasperExportManager;
+import net.sf.jasperreports.engine.JasperPrint;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.*;
@@ -49,6 +52,12 @@ public class PaymentServiceImpl implements PaymentService {
 
     @Autowired
     private UserRepository userRepository;
+
+    @Autowired
+    private ReportService reportService;
+
+    @Autowired
+    private EmailService emailService;
 
     @Value("${aeroswift.xendit.secretkey}")
     private String xenditSecretkey;
@@ -218,6 +227,27 @@ public class PaymentServiceImpl implements PaymentService {
                     log.error(e.getMessage());
                 }
             }
+
+            // generate pdf
+            try {
+                JasperPrint jasperPrint = reportService.generateInvoice(booking.getBookingId());
+
+                String pdfFilePath = "reports/invoice_aeroswift.pdf";
+                JasperExportManager.exportReportToPdfFile(jasperPrint, pdfFilePath);
+
+                EmailDetails emailDetails = new EmailDetails();
+                EmailDetails.builder()
+                        .recipient(booking.getUser().getEmailAddress())
+                        .subject("Your Invoice Aeroswift")
+                        .msgBody("Here Is Your Invoice")
+                        .attachment(pdfFilePath)
+                        .build();
+
+                emailService.sendEmailWithAttachment(emailDetails);
+            } catch (Exception e) {
+                throw new ExceptionHandling(e.getMessage());
+            }
+
 
             log.info("saving va to booking table");
             return "success";
