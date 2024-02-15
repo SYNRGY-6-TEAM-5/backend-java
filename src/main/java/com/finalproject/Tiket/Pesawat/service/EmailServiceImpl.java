@@ -51,9 +51,17 @@ public class EmailServiceImpl implements EmailService {
         CompletableFuture<Void> future = new CompletableFuture<>();
 
         try {
+            String recipientEmail = emailDetails.getRecipient();
+
+            if (recipientEmail == null || recipientEmail.isEmpty()) {
+                log.error("Recipient email address is null or empty");
+                future.completeExceptionally(new IllegalArgumentException("Recipient email address is null or empty"));
+                return future;
+            }
+
             MimeMessage message = mailSender.createMimeMessage();
             MimeMessageHelper messageHelper = new MimeMessageHelper(message, true);
-            messageHelper.setTo(emailDetails.getRecipient());
+            messageHelper.setTo(recipientEmail);
             messageHelper.setSubject(emailDetails.getSubject());
             messageHelper.setFrom("AeroSwift <" + senderEmail + ">");
             messageHelper.setText(emailDetails.getMsgBody(), true);
@@ -62,12 +70,13 @@ public class EmailServiceImpl implements EmailService {
             messageHelper.addAttachment(file.getFilename(), file);
 
             mailSender.send(message);
-            log.info("Sukses email sending");
+            log.info("Success: Email sent to " + recipientEmail);
             future.complete(null);
         } catch (MessagingException e) {
-            log.error("failed sending email " + e.getCause() + " " + e.getMessage());
+            log.error("Failed sending email: " + e.getCause() + " " + e.getMessage());
             future.completeExceptionally(e);
         }
+
         return future;
     }
 
@@ -115,7 +124,7 @@ public class EmailServiceImpl implements EmailService {
                 + "<div style=\"margin:50px auto; width:70%; padding:20px 0;\">"
                 + "<p><img alt=\"\" src=\"https://ckeditor.com/apps/ckfinder/userfiles/files/Vector.png\" style=\"width:150px;\" /></p>"
                 + "<h1 style=\"color: #00466a;\">AeroSwift</h1>"
-                + "<p style=\"line-height: 1.6; margin-bottom: 15px;\">Dear Customer</p>"
+                + "<p style=\"line-height: 1.6; margin-bottom: 15px;\">Dear " + email + ",</p>"
                 + "<p style=\"line-height: 1.6; margin-bottom: 15px;\">Thank you for choosing AeroSwift. Use the following OTP to complete your registration. OTP is valid for 5 minutes:</p>"
                 + "<h2 style=\"background: #00466a; margin: 0 auto; width: max-content; padding: 10px; color: #fff; border-radius: 4px; text-align: center;\">" + otp + "</h2>"
                 + "<p style=\"line-height: 1.6; margin-bottom: 15px;\">Regards,<br />AeroSwift</p>"
@@ -126,4 +135,24 @@ public class EmailServiceImpl implements EmailService {
 
         return emailTemplate;
     }
+
+    @Override
+    public String getInvoiceEmailTemplate(String email) {
+        String emailTemplate = "<div style=\"font-family: Helvetica, Arial, sans-serif; min-width:1000px; overflow:auto; line-height:2;\">"
+                + "<div style=\"margin:50px auto; width:70%; padding:20px 0;\">"
+                + "<p><img alt=\"\" src=\"https://ckeditor.com/apps/ckfinder/userfiles/files/Vector.png\" style=\"width:150px;\" /></p>"
+                + "<h1 style=\"color: #00466a;\">AeroSwift</h1>"
+                + "<p style=\"line-height: 1.6; margin-bottom: 15px;\">Dear " + email + ",</p>"
+                + "<p style=\"line-height: 1.6; margin-bottom: 15px;\">Thank you for choosing AeroSwift. We have attached your invoice in this email.</p>"
+                + "<p style=\"line-height: 1.6; margin-bottom: 15px;\">Please find the attached invoice for your recent purchase. If you have any questions or concerns regarding this invoice, please feel free to contact us.</p>"
+                + "<p style=\"line-height: 1.6; margin-bottom: 15px;\">Regards,<br />AeroSwift</p>"
+                + "<hr style=\"border: 1px solid #ddd; margin: 20px 0;\" />"
+                + "<footer style=\"text-align: center; color: #888; font-size: 0.8em; margin-top: 20px;\">© AeroSwift Team 2024. All rights reserved.</footer>"
+                + "</div>"
+                + "</div>";
+
+        return emailTemplate;
+    }
+
+
 }

@@ -12,4 +12,6 @@ public interface EmailService {
     String getWelcomingMessageEmailTemplate();
 
     String getRegisterOtpEmailTemplate(String email, String otp);
+
+    String getInvoiceEmailTemplate(String email);
 }
