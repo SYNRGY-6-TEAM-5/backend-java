@@ -7,7 +7,6 @@ import com.finalproject.Tiket.Pesawat.model.Role;
 import com.finalproject.Tiket.Pesawat.model.User;
 import com.finalproject.Tiket.Pesawat.repository.RoleRepository;
 import com.finalproject.Tiket.Pesawat.repository.UserRepository;
-import com.finalproject.Tiket.Pesawat.security.jwt.JwtUtils;
 import com.finalproject.Tiket.Pesawat.security.service.UserDetailsImpl;
 import com.finalproject.Tiket.Pesawat.utils.Utils;
 import jakarta.servlet.ServletException;
