@@ -35,7 +35,7 @@ public class ReportServiceImpl implements ReportService{
     }
     @Override
     public JasperPrint generateInvoice(Integer bookingId) throws Exception {
-        InputStream fileReport = new ClassPathResource("reports/invoice_aeroswift.jasper").getInputStream();
+        InputStream fileReport = new ClassPathResource("reports/jasper_report.jasper").getInputStream();
         JasperReport jasperReport = (JasperReport) JRLoader.loadObject(fileReport);
         Map<String, Object> param = new HashMap<>();
         param.put("BOOKING_ID", bookingId);
