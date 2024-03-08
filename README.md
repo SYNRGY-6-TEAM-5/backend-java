@@ -15,6 +15,8 @@ This repository contains the backend code for an e-ticket flights system, which 
 - **Database:** PostgreSQL
 - **Authentication:** JWT
 
+![A Screenshot of the Project](https://i.ibb.co/bB0833j/Screenshot-374.jpg)
+
 ## Usage
 
 - **Api Swagger Docs :** https://backend-java-production-defa.up.railway.app/v3/api-docs
